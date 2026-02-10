@@ -103,7 +103,7 @@ const FlipCard = ({ front, back, rotate, width, height, isFlipped }) => {
           {front}
         </div>
         <div
-          className="absolute inset-0 w-full h-full backface-hidden bg-white dark:bg-neutral-800 rounded-sm shadow-2xl p-6 border border-neutral-200 dark:border-neutral-700"
+          className="absolute inset-0 w-full h-full backface-hidden bg-white dark:bg-[#F3F3F1] board-item-shadow rounded-sm shadow-2xl shadow-black/50 p-6 border border-neutral-200 dark:border-[#D1D1D1]"
           style={{
             transform: 'rotateY(180deg)',
             WebkitTransform: 'rotateY(180deg)'
@@ -121,13 +121,23 @@ const FlipCard = ({ front, back, rotate, width, height, isFlipped }) => {
 const PolaroidItem = ({ data, onPlay, isPlaying }) => {
   const [isHoveringCard, setIsHoveringCard] = useState(false);
   const [isOverVideo, setIsOverVideo] = useState(false);
-  const shouldFlip = isHoveringCard && !isOverVideo;
+  const shouldFlip = isHoveringCard && !isOverVideo; //dont flip over video so user can play
+
+  const [isMobile, setIsMobile] = useState(false);
+
+  //resize for mobile
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const front = (
     <>
       <Pushpin />
 
-      <div className="bg-white dark:bg-neutral-800 p-3 pb-6 h-full shadow-xl border border-neutral-200 dark:border-neutral-700 flex flex-col">
+      <div className="bg-white dark:bg-[#F3F3F1] board-item-shadow p-3 pb-6 h-full shadow-xl shadow-black/30 border border-neutral-200 dark:border-[#D1D1D1] flex flex-col">
         <div
           className="relative w-full h-[75%] bg-black overflow-hidden group/img z-30"
           onMouseEnter={() => setIsOverVideo(true)}
@@ -164,11 +174,11 @@ const PolaroidItem = ({ data, onPlay, isPlaying }) => {
         </div>
 
         <div className="flex-1 flex flex-col justify-center items-center pt-3 px-1 text-center">
-          <h3 className={`font-['Caveat'] font-bold text-neutral-800 dark:text-white leading-tight mb-1 
+          <h3 className={`font-['Caveat'] font-bold text-neutral-800 dark:text-black leading-tight mb-1 
           ${data.title.length > 20 ? 'text-lg' : 'text-2xl'}`}>
             {data.title}
           </h3>
-          <p className="font-mono text-[11px] text-blue-500 font-black tracking-tighter uppercase line-clamp-1">
+          <p className="font-mono text-[11px] text-blue-500 dark:text-blue-400 font-black tracking-tighter uppercase line-clamp-1">
             {data.skills}
           </p>
         </div>
@@ -179,12 +189,12 @@ const PolaroidItem = ({ data, onPlay, isPlaying }) => {
   const back = (
     <div className="flex flex-col h-full justify-between">
       <div className="space-y-3">
-        <h4 className="font-black uppercase text-[10px] tracking-widest text-blue-600 dark:text-blue-400">Project Insight</h4>
-        <p className="font-['Caveat'] text-lg leading-tight text-neutral-700 dark:text-neutral-300 line-clamp-5">
+        <h4 className="font-black uppercase text-[8px] md:text-[10px] tracking-widest text-blue-600 dark:text-blue-500">Project Insight</h4>
+        <p className="font-['Caveat'] text-base md:text-lg leading-tight text-neutral-700 dark:text-neutral-600 line-clamp-5">
           {data.text}
         </p>
-        <div className="pt-2 border-t border-neutral-100 dark:border-neutral-700">
-          <p className="font-mono text-[11px] text-blue-800 font-bold uppercase">
+        <div className="pt-2 border-t border-neutral-100 dark:border-neutral-200">
+          <p className="font-mono text-[11px] text-blue-800 dark:text-blue-600 font-bold uppercase">
             {data.skills}
           </p>
         </div>
@@ -192,13 +202,13 @@ const PolaroidItem = ({ data, onPlay, isPlaying }) => {
 
       <div className="space-y-4">
         <div className="flex gap-4 text-xl text-neutral-400">
-          {data.ghlink && <a href={data.ghlink} target="_blank" rel="noreferrer"><FontAwesomeIcon icon={faGithub} className="text-black dark:text-white" /></a>}
+          {data.ghlink && <a href={data.ghlink} target="_blank" rel="noreferrer"><FontAwesomeIcon icon={faGithub} className="text-black" /></a>}
           {data.devpost && (
             <a
               href={data.devpost}
               target="_blank"
               rel="noreferrer"
-              className="text-[#003E54] dark:text-teal-400 transition-colors"
+              className="text-[#003E54] transition-colors"
             >
               <svg
                 fill="currentColor"
@@ -239,8 +249,8 @@ const PolaroidItem = ({ data, onPlay, isPlaying }) => {
         front={front}
         back={back}
         rotate={data.rotate}
-        width="320px"
-        height="360px"
+        width={isMobile ? "250px" : "320px"}
+        height={isMobile ? "300px" : "360px"}
         isFlipped={shouldFlip}
       />
     </div>
@@ -249,13 +259,22 @@ const PolaroidItem = ({ data, onPlay, isPlaying }) => {
 
 const PostcardItem = ({ data }) => {
   const [isHovering, setIsHovering] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  //resize for mobile
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const front = (
     <>
       {/* postcard magnet */}
-      <div className="absolute -top-12 left-1/2 -translate-x-1/2 z-40 pointer-events-none group-hover:scale-110 transition-transform duration-300">
-        <div className="w-20 h-20 rounded-full bg-gradient-to-br from-neutral-300 via-neutral-500 to-neutral-800 dark:from-neutral-600 dark:via-neutral-800 dark:to-neutral-950 shadow-2xl border-b-4 border-neutral-900 flex items-center justify-center relative">
-          <div className="absolute top-1.5 left-2 w-3 h-1.5 bg-white/30 rounded-full rotate-[-40deg]"></div>
+      <div className="absolute -top-5 md:-top-12 left-1/2 -translate-x-1/2 z-40 pointer-events-none group-hover:scale-110 transition-transform duration-300">
+        <div className="w-10 h-10 md:w-20 md:h-20 rounded-full bg-gradient-to-br from-neutral-300 via-neutral-500 to-neutral-800 dark:from-neutral-200 dark:via-neutral-400 dark:to-neutral-600 shadow-2xl border-b-4 border-neutral-900 flex items-center justify-center relative">
+          <div className="absolute top-4 left-2 w-3 h-1.5 bg-white/30 rounded-full rotate-[-40deg]"></div>
           <div className="w-6 h-6 rounded-full border border-white/5 shadow-inner bg-black/10 flex items-center justify-center">
             <div className="w-1 h-1 bg-black/40 rounded-full"></div>
           </div>
@@ -263,19 +282,22 @@ const PostcardItem = ({ data }) => {
         <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-8 h-3 bg-black/40 blur-md rounded-full -z-10"></div>
       </div>
 
-      <div className="bg-[#fffcf5] dark:bg-neutral-900 p-3 h-full shadow-2xl border border-neutral-300 dark:border-neutral-800 flex flex-col">
-        <div className="w-full h-[75%] bg-neutral-100 dark:bg-black overflow-hidden relative border-b border-neutral-200 dark:border-neutral-800">
+      <div className="bg-[#fffcf5] dark:bg-[#F3F3F1] board-item-shadow p-3 h-full shadow-2xl shadow-black/50 border border-neutral-300 dark:border-[#D1D1D1]flex flex-col">
+        <div className="w-full h-[75%] bg-neutral-100 dark:bg-[#F3F3F1] overflow-hidden relative border-b border-neutral-200 dark:border-[#D1D1D1]">
+          {/* postcard image */}
           <img src={data.img} className="w-full h-full object-cover" alt="card-art" />
+          {/* postcard stamp */}
           <div className="absolute top-4 right-4 w-12 h-14 border-2 border-red-600 flex flex-col items-center justify-center font-black text-[10px] text-red-600 rotate-12 bg-white/90">
             <span>{data.stamp || 'POST'}</span>
             <div className="w-6 h-0.5 bg-red-600 my-0.5"></div>
             <span className="text-[6px]">2026</span>
           </div>
         </div>
-        <div className="flex-1 flex items-center justify-between px-2">
+        <div className="flex-1 flex items-center justify-between md:px-2">
+          {/* postcard info */}
           <div>
-            <h2 className="text-xl font-black uppercase leading-none truncate">{data.title}</h2>
-            <h3 className="font-['Caveat'] text-2xl text-blue-600 dark:text-blue-400 font-bold leading-none mt-1">{data.role}</h3>
+            <h2 className="text-[12px] md:text-xl font-black text-black uppercase leading-none truncate">{data.title}</h2>
+            <h3 className="font-['Caveat'] text-[1em] md:text-2xl text-blue-600 dark:text-blue-500 font-bold leading-none mt-1">{data.role}</h3>
           </div>
         </div>
       </div>
@@ -283,15 +305,15 @@ const PostcardItem = ({ data }) => {
   );
 
   const back = (
-    <div className="h-full flex flex-col justify-between border-l-2 border-dashed border-neutral-300 dark:border-neutral-700 pl-6">
+    <div className="h-full flex flex-col justify-between border-l-2 border-dashed border-neutral-300 dark:border-[#D1D1D1] pl-6">
       <div className="space-y-4">
         <div className="flex justify-between items-start">
-          <FontAwesomeIcon icon={faQuoteLeft} className="text-3xl text-blue-100 dark:text-neutral-700" />
+          <FontAwesomeIcon icon={faQuoteLeft} className="text-3xl text-blue-100 dark:text-blue-200" />
           <div className="text-right text-[10px] font-mono opacity-50 uppercase tracking-widest">
             <FontAwesomeIcon icon={faMapMarkerAlt} className="mr-1" /> {data.location}
           </div>
         </div>
-        <p className="font-['Caveat'] text-2xl text-neutral-700 dark:text-neutral-300 leading-tight">
+        <p className="font-['Caveat'] text-base md:text-2xl text-neutral-700 dark:text-neutral-600 leading-tight">
           {data.text}
         </p>
       </div>
@@ -308,8 +330,8 @@ const PostcardItem = ({ data }) => {
       <FlipCard
         front={front}
         back={back}
-        width="600px"
-        height="400px"
+        width={isMobile ? "325px" : "600px"}
+        height={isMobile ? "300px" : "400px"}
         isFlipped={isHovering}
       />
     </div>
@@ -318,10 +340,14 @@ const PostcardItem = ({ data }) => {
 
 const PhotoStripItem = ({ data }) => (
   <div
-    className={`bg-white dark:bg-neutral-900 p-2 pt-6 shadow-xl flex flex-col gap-2 transition-all duration-300 hover:scale-105 hover:z-20 cursor-pointer ${data.rotate} border border-neutral-200 dark:border-neutral-800 relative group/strip`}
-    style={{ width: '180px', height: '580px' }}
+    className={`
+      bg-white dark:bg-[#EBEBEB] p-2 pt-6 shadow-xl shadow-black/30 flex flex-col gap-2 transition-all duration-300 hover:scale-105 hover:z-20 cursor-pointer 
+      ${data.rotate} border border-neutral-200 dark:border-neutral-700 relative group/strip w-[130px] h-[420px] md:w-[180px] md:h-[580px]
+    `}
   >
-    <BlueWashiTape className="absolute -top-3 left-1/2 -translate-x-1/2 w-10 h-3" />
+    <BlueWashiTape className="absolute -top-3 left-1/2 -translate-x-1/2 w-10 h-3 md:w-25 md:h-8" />
+    
+    {/* array of 3 pics/projects */}
     {[...Array(3)].map((_, i) => (
       <div
         key={i}
@@ -336,34 +362,35 @@ const PhotoStripItem = ({ data }) => (
           />
         ) : (
           <div className="w-full h-full flex flex-col relative group/blueprint">
+            {/*grid*/}
             <div
-              className="absolute inset-0 opacity-[0.08] dark:opacity-[0.15]"
+              className="absolute inset-0 opacity-[0.08] dark:opacity-[0.10]"
               style={{
                 backgroundImage: 'linear-gradient(#3b82f6 1px, transparent 1px), linear-gradient(90deg, #3b82f6 1px, transparent 1px)',
-                backgroundSize: '12px 12px'
+                backgroundSize: '10px 10px'
               }}
             />
 
-            <div className="absolute top-1 left-1 w-2 h-2 border-t border-l border-blue-300 dark:border-blue-700"></div>
-            <div className="absolute top-1 right-1 w-2 h-2 border-t border-r border-blue-300 dark:border-blue-700"></div>
-            <div className="absolute bottom-1 left-1 w-2 h-2 border-b border-l border-blue-300 dark:border-blue-700"></div>
-            <div className="absolute bottom-1 right-1 w-2 h-2 border-b border-r border-blue-300 dark:border-blue-700"></div>
+            <div className="absolute top-1 left-1 w-2 h-2 border-t border-l border-blue-300 dark:border-blue-400"></div>
+            <div className="absolute top-1 right-1 w-2 h-2 border-t border-r border-blue-300 dark:border-blue-400"></div>
 
-            <span className="absolute top-2 right-2 text-[7px] font-mono text-blue-400 font-bold tracking-widest opacity-60">
+            <span className="absolute top-2 right-2 text-[6px] md:text-[7px] font-mono text-blue-400 font-bold tracking-widest opacity-60">
               FIG. 0{i + 1}
             </span>
 
-            <div className="flex-1 flex items-center justify-center p-4 text-blue-800 dark:text-blue-300 opacity-60 group-hover/blueprint:opacity-90 group-hover/blueprint:scale-110 transition-all duration-500">
+            {/* mid icon */}
+            <div className="flex-1 flex items-center justify-center p-2 md:p-4 text-blue-800 dark:text-blue-700 opacity-20 md:opacity-60 group-hover/blueprint:opacity-90 group-hover/blueprint:scale-110 transition-all duration-500">
               {data.svgs?.[i]}
             </div>
 
+            {/* Project Label Area */}
             {data.projectNames?.[i] && (
-              <div className="relative z-10 w-full bg-white/90 dark:bg-neutral-900/90 border-t border-blue-100 dark:border-blue-900/30 p-2 backdrop-blur-[2px] flex flex-col items-center justify-center min-h-[30%]">
-                <span className="text-[10px] font-black text-blue-900 dark:text-blue-100 uppercase tracking-tighter leading-none text-center">
+              <div className="relative z-10 w-full bg-white/90 dark:bg-neutral-100/95 border-t border-blue-100 dark:border-blue-200 p-1.5 md:p-2 backdrop-blur-[2px] flex flex-col items-center justify-center min-h-[35%] md:min-h-[30%]">
+                <span className="text-[8px] md:text-[10px] font-black text-blue-900 dark:text-blue-800 uppercase tracking-tighter leading-none text-center">
                   {data.projectNames[i]}
                 </span>
                 {data.description?.[i] && (
-                  <span className="mt-1 text-[7px] font-mono font-medium text-blue-600 dark:text-blue-400 uppercase tracking-wide text-center leading-tight">
+                  <span className="mt-1 text-[6px] md:text-[7px] font-mono font-medium text-blue-600 dark:text-blue-700 uppercase tracking-wide text-center leading-tight">
                     {data.description[i]}
                   </span>
                 )}
@@ -374,8 +401,9 @@ const PhotoStripItem = ({ data }) => (
       </div>
     ))}
 
-    <div className="text-center py-2 border-t border-dashed border-neutral-200 dark:border-neutral-700">
-      <p className="font-['Caveat'] text-xl font-bold leading-none text-blue-700 dark:text-blue-400 mb-1 italic">
+    {/* Bottom Title Section */}
+    <div className="text-center py-1 md:py-2 border-t border-dashed border-neutral-200 dark:border-neutral-700">
+      <p className="font-['Caveat'] text-lg md:text-xl font-bold leading-none text-blue-700 dark:text-blue-800 mb-1 italic">
         {data.title}
       </p>
     </div>
@@ -384,19 +412,32 @@ const PhotoStripItem = ({ data }) => (
 
 const StickyItem = ({ data }) => (
   <div
-    className={`${data.color} p-6 shadow-xl flex flex-col items-center justify-center text-center relative border-b-4 border-black/10 transition-all hover:rotate-0 hover:scale-110 cursor-pointer ${data.rotate}`}
-    style={{ width: '200px', height: '200px' }}
+    className={`
+      ${data.color} p-4 md:p-6 shadow-xl flex flex-col items-center justify-center text-center relative border-b-4 border-black/10 transition-all hover:rotate-0 hover:scale-110 
+      cursor-pointer ${data.rotate} w-[150px] h-[150px] md:w-[200px] md:h-[200px]
+    `}
     onClick={() => data.link && window.open(data.link)}
   >
     <Pushpin />
-    <div className="absolute top-0 left-0 w-full h-3 bg-white/20"></div>
-    <FontAwesomeIcon icon={data.icon} className="text-3xl mb-3 text-black/40" />
-    <h3 className="text-[10px] font-black uppercase mb-1 opacity-40">{data.title}</h3>
-    <p className="font-['Caveat'] text-xl font-bold text-black/80 leading-tight">{data.text}</p>
+    <div className="absolute top-0 left-0 w-full h-2 md:h-3 bg-white/20"></div>
+    
+    <FontAwesomeIcon 
+      icon={data.icon} 
+      className="text-2xl md:text-3xl mb-2 md:mb-3 text-black/40" 
+    />
+    
+    {/* info */}
+    <h3 className="text-[8px] md:text-[10px] font-black uppercase mb-1 opacity-40 dark:opacity-50 leading-none">
+      {data.title}
+    </h3>
+    <p className="font-['Caveat'] text-[14px] md:text-xl font-bold text-black/80 leading-tight">
+      {data.text}
+    </p>
   </div>
 );
 
-const IDCard = ({ data }) => {
+const IDCard = ({ data, theme, setTheme }) => {
+
   const allCourses = [
     { id: "281", name: "Data Structures & Alg" },
     { id: "370", name: "Computer Architecture" },
@@ -416,117 +457,170 @@ const IDCard = ({ data }) => {
   ];
 
   return (
-    <div
-      className={`bg-white dark:bg-neutral-900 shadow-2xl relative transition-all hover:scale-105 hover:z-20 cursor-pointer ${data.rotate} border-t-[14px] border-blue-900 dark:border-blue-700 rounded-xl overflow-hidden`}
-      style={{
-        width: '520px',
-        height: '390px',
-      }}
+    <div className="relative inline-block group w-[520px] h-[250px] md:w-[520px] md:h-[390px]">
+  
+  {/* dark/light mode magnet  { width: '520px', height: '390px' } style={{ width: '520px', height: '250px' }} */}
+  <div className="absolute -top-6 -right-1 md:-right-6 z-50 transition-transform duration-300 group-hover:scale-110">
+    <button
+      onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+      className="group relative w-10 h-10 md:w-20 md:h-20 flex items-center justify-center outline-none"
     >
-      <div className="py-3 px-5 relative z-10 h-full flex flex-col">
-        <div className="flex justify-between items-start mb-3">
-          <div className="flex flex-col">
-            <h3 className="text-xl font-black text-blue-900 dark:text-blue-400 tracking-tighter leading-none uppercase">
-              University of Michigan
-            </h3>
-            <span className="text-[10px] font-mono font-bold text-neutral-400 dark:text-neutral-500 uppercase tracking-widest mt-1">
-              Ann Arbor, MI • College of Engineering
-            </span>
-          </div>
-          <div className="text-right">
-            <span className="bg-blue-900 text-yellow-400 px-3 py-1 text-[10px] font-black rounded italic shadow-sm">
-              CLASS OF 2026
-            </span>
-          </div>
+      <div className={`
+        absolute inset-0 rounded-full transition-all duration-300
+        border-b-4 active:border-b-0 active:translate-y-1
+        flex items-center justify-center
+        ${theme === 'dark'
+          ? 'bg-neutral-800 border-neutral-950 shadow-[0_10px_20px_rgba(0,0,0,0.5)]'
+          : 'bg-white border-neutral-200 shadow-[0_10px_20px_rgba(0,0,0,0.2)]'
+        }
+      `}>
+        <div className="absolute top-2 left-3 w-2 h-1 md:w-4 h-2 bg-white/20 rounded-full rotate-[-35deg] pointer-events-none"></div>
+        <div className={`
+          md:text-3xl transition-all duration-500 transform
+          ${theme === 'dark' ? 'text-blue-400 rotate-0 scale-100' : 'text-yellow-500 rotate-[360deg] scale-110'}
+          group-hover:scale-125
+        `}>
+          <FontAwesomeIcon icon={theme === 'dark' ? faMoon : faSun} />
         </div>
-        <div className="flex gap-6 mb-3">
-          <div className="w-28 h-28 bg-neutral-100 dark:bg-neutral-800 border-2 border-neutral-200 dark:border-neutral-700 rounded-lg overflow-hidden grayscale flex-shrink-0 shadow-inner">
-            <img src={shriya} className="w-full h-full object-cover" alt="id-photo" />
-          </div>
+        <div className="absolute inset-1 rounded-full border border-black/5 dark:border-white/5 pointer-events-none"></div>
+      </div>
+      <div className="absolute -bottom-1 w-6 h-3 md:w-12 h-4 bg-black/40 blur-md rounded-full -z-10"></div>
+    </button>
+  </div>
 
-          <div className="flex flex-col justify-center flex-1">
-            <div className="mb-3">
-              <h4 className="text-3xl font-black italic uppercase text-neutral-800 dark:text-white leading-none mb-1">
-                Shriya Biddala
-              </h4>
-              <p className="text-blue-600 dark:text-blue-400 text-[11px] font-bold uppercase tracking-tight">
-                B.S.E. Computer Science Engineering
-              </p>
-            </div>
-            <div className="flex flex-wrap gap-x-3 gap-y-1 opacity-70">
-              {activities.map((act, i) => (
-                <span key={i} className="text-[8px] font-bold text-neutral-500 dark:text-neutral-400 uppercase italic">
-                  • {act}
-                </span>
-              ))}
-            </div>
-          </div>
+  {/* 2026 overlay */}
+  <div className="absolute right-1 md:right-4 top-14 md:top-10 md:bottom-10 z-30 flex flex-col justify-center items-center pointer-events-none">
+     <div className="flex flex-col md:gap-4 font-sans font-extrabold text-3xl font-black text-blue-900/20 dark:text-blue-700/20 select-none">
+        <span>2</span>
+        <span>0</span>
+        <span>2</span>
+        <span>6</span>
+     </div>
+  </div>
+
+  <div
+    className={`bg-white dark:bg-[#E8E8E8] shadow-2xl shadow-black/50 relative transition-all duration-500 hover:scale-[1.01] ${data.rotate} border-t-[14px] border-blue-900 dark:border-blue-700 rounded-xl overflow-hidden h-full w-full`}
+  >
+    <div className="py-2 px-3 md:px-5 relative z-10 h-full flex flex-col">
+      {/* top border w school info */}
+      <div className="flex justify-between items-start mb-3">
+        <div className="flex flex-col">
+          <h3 className="text-xs md:text-xl font-black text-blue-900 tracking-tighter leading-none uppercase">
+            University of Michigan
+          </h3>
+          <span className="text-[8px] md:text-[10px] font-mono font-bold text-neutral-400 dark: text-neutral-500 uppercase tracking-widest mt-1">
+            Ann Arbor, MI • College of Engineering
+          </span>
         </div>
-        <div className="flex-1 border-t border-neutral-100 dark:border-neutral-800 pt-2">
-          <h5 className="text-[9px] font-black text-blue-900 dark:text-blue-400 uppercase mb-2 tracking-[0.2em] flex items-center gap-2">
-            <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
-            Coursework Inventory
-          </h5>
+        <div className="text-right md:mr-8"> 
+          <span className="bg-blue-900 text-yellow-400 px-1 py-1 md:px-3 text-[6px] md:text-[10px] font-black rounded italic shadow-sm">
+            CLASS OF 2026
+          </span>
+        </div>
+      </div>
 
-          <div className="grid grid-cols-2 gap-x-10 gap-y-2">
-            {allCourses.map((course, i) => (
-              <div key={i} className="flex flex-col">
-                <span className="text-[8px] font-mono font-black text-blue-600 dark:text-blue-400 leading-none uppercase">
-                  EECS {course.id}
-                </span>
-                <span className="text-[10px] font-bold text-neutral-700 dark:text-neutral-300 uppercase leading-tight truncate">
-                  {course.name}
-                </span>
-              </div>
+      {/* top half of card */}
+      <div className="flex gap-6 md:mb-3">
+        <div className="w-14 h-14 md:w-28 md:h-28 bg-neutral-100 dark:bg-neutral-200 border-2 border-neutral-200 dark:border-neutral-300 rounded-lg overflow-hidden grayscale flex-shrink-0 shadow-inner">
+          <img src={shriya} className="w-full h-full object-cover" alt="id-photo" />
+        </div>
+        <div className="flex flex-col justify-center flex-1">
+          <div className="md:mb-3">
+            <h4 className="text-base md:text-3xl font-black italic uppercase text-neutral-800 leading-none">
+              Shriya Biddala
+            </h4>
+            <p className="text-blue-600 text-[8px] md:text-[11px] font-bold uppercase tracking-tight">
+              B.S.E. Computer Science Engineering
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-x-3 md:gap-y-1 opacity-70">
+            {activities.map((act, i) => (
+              <span key={i} className="text-[6px] md:text-[8px] font-bold text-neutral-600 dark:text-neutral-700 uppercase italic">• {act}</span>
             ))}
           </div>
         </div>
-
       </div>
+
+      {/* bottom half of ccard */}
+      <div className="flex-1 border-t border-neutral-100 dark:border-neutral-400 pt-2">
+        <h5 className="text-[5px] md:text-[9px] font-black text-blue-900 uppercase mb-2 tracking-[0.2em] flex items-center gap-2">
+          <div className="w-1 h-1 md:w-2 md:h-2 bg-yellow-400 rounded-full"></div>
+          Coursework Inventory
+        </h5>
+        <div className="grid grid-cols-2 md:gap-x-10 md:gap-y-2">
+          {allCourses.map((course, i) => (
+            <div key={i} className="flex flex-col">
+              <span className="text-[6px] md:text-[8px] font-mono font-black text-blue-600 leading-none uppercase">EECS {course.id}</span>
+              <span className="text-[8px] md:text-[10px] font-bold text-neutral-700 uppercase leading-tight truncate">{course.name}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
       <div className="absolute bottom-0 left-0 w-full">
-        <div className="h-10 bg-neutral-50 dark:bg-neutral-800/50 flex items-center px-6 gap-4 border-t border-neutral-200 dark:border-neutral-800">
+        <div className="h-5 md:h-10 bg-neutral-50 dark:bg-neutral-300 flex items-center px-4 md:px-6 gap-2 md:gap-4 border-t border-neutral-200 dark:border-neutral-800">
           <div className="flex-1 h-4 flex gap-[1px] opacity-30">
             {[...Array(60)].map((_, i) => (
-              <div key={i} className={`h-full bg-black dark:bg-white ${Math.random() > 0.6 ? 'w-[2px]' : 'w-[1px]'}`}></div>
+              <div key={i} className={`h-full bg-black ${Math.random() > 0.6 ? 'w-[2px]' : 'w-[1px]'}`}></div>
             ))}
           </div>
-          <span className="text-[9px] font-mono font-bold tracking-[0.4em] text-neutral-400 uppercase">
-            CERT_ID_EECS_2026
-          </span>
+          <span className="text-[6px] md:text-[9px] font-mono font-bold tracking-[0.4em] text-neutral-400 uppercase">CERT_ID_EECS_2026</span>
         </div>
         <div className="h-1.5 bg-gradient-to-r from-blue-900 via-yellow-400 to-blue-900"></div>
       </div>
     </div>
+  </div>
+</div>
   );
 };
 
-const SkillSticky = ({ title, skills, color, rotate }) => (
-  <div
-    className={`${color} p-6 shadow-lg relative transition-all hover:scale-110 hover:z-30 cursor-default ${rotate}`}
-    style={{ width: '260px', minHeight: '260px', clipPath: 'polygon(0% 0%, 100% 0%, 100% 90%, 93% 100%, 0% 100%)' }}
-  >
-    <div className="absolute top-0 left-0 w-full h-4 bg-black/5"></div>
+const SkillSticky = ({ title, skills, color, rotate }) => {
+  const [isMobile, setIsMobile] = useState(false);
 
-    <h3 className="font-sans text-base font-bold mb-4 border-b border-black/10 pb-1 text-black/70 uppercase tracking-tight">
-      {title}
-    </h3>
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
-    <ul className="space-y-1">
-      {skills.map((s, i) => (
-        <li key={i} className="font-['Caveat'] text-xl font-medium flex justify-between items-center text-black/80">
-          <span>{s.name}</span>
-          <span className="text-sm font-mono font-bold opacity-40">{s.yrs}</span>
-        </li>
-      ))}
-    </ul>
+  const dim = isMobile ? '180px' : '260px'; //resize dims
 
-    <div className="absolute bottom-0 right-0 w-6 h-6 bg-black/10"></div>
-  </div>
-);
+  return (
+    <div
+      className={`${color} dark:before:absolute dark:before:inset-0 dark:before:bg-black/20 dark:before:pointer-events-none p-4 md:p-6 shadow-xl shadow-black/50 relative transition-all hover:scale-110 hover:z-30 cursor-default ${rotate}`}
+      style={{ 
+        width: dim, 
+        minHeight: dim, 
+        clipPath: 'polygon(0% 0%, 100% 0%, 100% 92%, 92% 100%, 0% 100%)' 
+      }}
+    >
+      <div className="absolute top-0 left-0 w-full h-3 md:h-4 bg-black/5"></div>
+
+      <h3 className="font-sans text-sm md:text-base font-bold mb-3 md:mb-4 border-b border-black/10 pb-1 text-black/70 uppercase tracking-tight">
+        {title}
+      </h3>
+
+      {/* list of skills param */}
+      <ul className="space-y-0.5 md:space-y-1">
+        {skills.map((s, i) => (
+          <li key={i} className="font-['Caveat'] text-[14px] md:text-xl font-medium flex justify-between items-center text-black/80">
+            <span className="truncate mr-2 text-wrap">{s.name}</span>
+            <span className="text-[11px] md:text-sm font-[Caveat] font-black opacity-60 shrink-0">
+              {s.yrs}
+            </span>
+          </li>
+        ))}
+      </ul>
+
+      <div className="absolute bottom-0 right-0 w-4 h-4 md:w-6 md:h-6 bg-black/10"></div>
+    </div>
+  );
+};
 
 const BlueWashiTape = ({ className }) => (
   <div
-    className={`absolute w-24 h-8 bg-blue-400/30 dark:bg-blue-500/20 backdrop-blur-[1px] z-30 border-x border-white/10 pointer-events-none ${className}`}
+    className={`absolute w-24 h-8 bg-blue-400/30 dark:bg-blue-500/60 backdrop-blur-[1px] z-30 border-x border-white/10 pointer-events-none ${className}`}
     style={{
       clipPath: 'polygon(5% 0%, 95% 2%, 100% 50%, 95% 98%, 5% 100%, 0% 50%)',
     }}
@@ -537,7 +631,7 @@ const Pushpin = () => (
   <>
     {/* push pin */}
     <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-30 pointer-events-none">
-      <div className="w-4 h-4 bg-red-600 rounded-full shadow-md relative">
+      <div className="w-4 h-4 bg-red-600 dark:bg-red-700 rounded-full shadow-md relative">
         <div className="absolute top-1 left-1 w-1.5 h-1 bg-white/30 rounded-full"></div>
       </div>
       <div className="w-4 h-2 bg-black/20 blur-[1px] rounded-full mt-0.5 ml-1"></div>
@@ -547,7 +641,7 @@ const Pushpin = () => (
 
 export default function App() {
   const [playingVideoId, setPlayingVideoId] = useState(null);
-  const [theme, setTheme] = useState(localStorage.getItem('theme') || 'dark');
+  const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light');
   const formRef = useRef(null);
   const [isSent, setIsSent] = useState(false);
   const [replyText, setReplyText] = useState("");
@@ -709,7 +803,7 @@ export default function App() {
         "Implemented a Feed-Forward Neural Network (FFNN) leveraging pretrained GloVe word embeddings. Explored vector semantics to train dense vector representations for text classification tasks.",
         "Developed character-level and word-level n-gram models to generate synthetic Yelp reviews. Built a Naive Bayes classifier to distinguish between legitimate news headlines and clickbait with high accuracy."
       ],
-      bgColors: ['#FFCB05', 'rgba(0, 39, 76, 0.1)', 'rgba(0, 39, 76, 0.05)'],
+      bgColors: ['#FFCB05', 'rgba(194, 225, 255, 1)', 'rgba(211, 255, 225, 1)'],
       rotate: 'rotate-2',
     },
     {
@@ -801,7 +895,7 @@ export default function App() {
       img: oneVote,
       skills: "#GPT4 #TF-IDF #HTML/CSS/JS #CivicTech",
       text: "🏆 Best Hack for Social Impact: 3rd Place. Web application for local elections awareness with a conversational agent answering questions and guiding users to polling stations. ",
-      rotate: 'rotate-3',
+      rotate: '-rotate-3',
       devpost: "https://devpost.com/software/onevote-lsp7eu",
       yt: "https://www.youtube.com/watch?v=-eGkraEZ6HA"
     },
@@ -846,7 +940,7 @@ export default function App() {
       img: architext,
       skills: "#VSCodeAPI #LlamaAPI #Python #JS",
       text: "VSCode extension that creates and inserts AI-generated code documentation with one click.",
-      rotate: '-rotate-2',
+      rotate: '-rotate-1',
       ghlink: "https://github.com/shriyabi/SparthackX",
       yt: "https://www.youtube.com/watch?v=HxY2zq5rcqk&t=1s",
       devpost: "https://devpost.com/software/architext"
@@ -860,7 +954,7 @@ export default function App() {
       img: greenBro,
       skills: "#ReactJS #React_Native #TailwindCSS",
       text: "Web application for local elections awareness with a conversational agent answering questions and guiding users to polling stations.",
-      rotate: 'rotate-1',
+      rotate: 'rotate-3',
       ghlink: "https://github.com/shriyabi/for_michigan_website",
       yt: "https://www.youtube.com/watch?v=BbTT9nJbXnE",
       devpost: "https://devpost.com/software/greenbrother"
@@ -910,10 +1004,10 @@ export default function App() {
 
 
     //social media stickies
-    { id: 'st-1', type: 'sticky', title: "LinkedIn", text: "/in/shriya-biddala", color: 'bg-yellow-200 dark:bg-yellow-600', icon: faLinkedin, rotate: 'rotate-6', link: 'https://linkedin.com' },
-    { id: 'st-2', type: 'sticky', title: "GitHub", text: "Commits: @shriyabi", color: 'bg-cyan-200 dark:bg-cyan-700', icon: faGithub, rotate: '-rotate-6', link: 'https://github.com/shriyabi' },
-    { id: 'st-3', type: 'sticky', title: "Email", text: "shriyarbiddala@gmail.com", color: 'bg-red-200 dark:bg-red-700', icon: faEnvelope, rotate: 'rotate-6', link: "mailto:shriyarbiddala@gmail.com" },
-    { id: 'st-4', type: 'sticky', title: "YouTube", text: "Shri Ram", color: 'bg-green-200 dark:bg-red-700', icon: faYoutube, rotate: 'rotate-6', link: 'https://www.youtube.com/channel/UCF1wX0AqAWlqtwaSraqN6kA' },
+    { id: 'st-1', type: 'sticky', title: "LinkedIn", text: "/in/shriya-biddala", color: 'bg-yellow-200 dark:bg-yellow-500', icon: faLinkedin, rotate: 'rotate-6', link: 'https://linkedin.com' },
+    { id: 'st-2', type: 'sticky', title: "GitHub", text: "Commits: @shriyabi", color: 'bg-cyan-200 dark:bg-cyan-500', icon: faGithub, rotate: '-rotate-6', link: 'https://github.com/shriyabi' },
+    { id: 'st-3', type: 'sticky', title: "Email", text: "shriyarbiddala@gmail.com", color: 'bg-red-200 dark:bg-red-500', icon: faEnvelope, rotate: 'rotate-6', link: "mailto:shriyarbiddala@gmail.com" },
+    { id: 'st-4', type: 'sticky', title: "YouTube", text: "Shri Ram", color: 'bg-green-200 dark:bg-green-500', icon: faYoutube, rotate: 'rotate-6', link: 'https://www.youtube.com/channel/UCF1wX0AqAWlqtwaSraqN6kA' },
 
 
     //  {
@@ -936,7 +1030,7 @@ export default function App() {
 
 
   return (
-    <div className="min-h-screen bg-[#f3f0eb] dark:bg-[#0c0c0c] text-neutral-900 dark:text-neutral-100 p-8">
+    <div className="min-h-screen corkboard bg-[#F0E8D3] dark:bg-[#241B15] text-neutral-900 dark:text-neutral-100 p-8">
 
       <div className="max-w-[1600px] mx-auto flex flex-col md:flex-row justify-between items-end mb-24 px-8 relative">
 
@@ -955,7 +1049,7 @@ export default function App() {
 
           {/* highlighter */}
           <div
-            className="absolute top-1 -left-2 -right-4 h-[45%] bg-blue-400/40 dark:bg-blue-500/30 z-0 animate-stroke"
+            className="absolute top-1 -left-2 -right-4 h-[45%] bg-blue-400/40 dark:bg-blue-500/60 z-0 animate-stroke"
             style={{
               borderRadius: '20% 80% 15% 85% / 95% 15% 85% 5%',
               filter: 'blur(0.4px)',
@@ -963,163 +1057,131 @@ export default function App() {
               clipPath: 'inset(0 100% 0 0)'
             }}
           />
-          <h1 className="relative z-10 text-6xl md:text-7xl font-black italic tracking-tighter uppercase leading-none text-neutral-800 dark:text-white">
+          <h1 className="relative z-10 text-5xl md:text-7xl font-black italic tracking-tighter uppercase leading-none text-black dark:text-white">
             shriya's <span className="text-blue-600 relative">bulletin</span> board
           </h1>
-          <p className="font-['Caveat'] text-3xl text-neutral-500 dark:text-neutral-400 mt-4 italic animate__animated animate__fadeIn flex items-center gap-3">
-            <span className="h-[1px] w-8 bg-neutral-300 dark:bg-neutral-700 block"></span>
+          <p className="font-['Caveat'] text-xl md:text-3xl text-neutral-500 dark:text-neutral-400 mt-4 italic animate__animated animate__fadeIn flex items-center gap-3">
+            <span className="h-[1px] w-8 bg-neutral-400 dark:bg-neutral-100 dark:bg-neutral-700 block"></span>
             "Be the change you wish to see in the world..."
           </p>
         </div>
 
-        <div className="relative mt-8 md:mt-0">
-          <button
-            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-            className="group relative w-16 h-16 flex items-center justify-center outline-none"
-          >
-            <div className={`
-      absolute inset-0 rounded-full transition-all duration-300
-      border-b-4 active:border-b-0 active:translate-y-1
-      flex items-center justify-center
-      ${theme === 'dark'
-                ? 'bg-neutral-800 border-neutral-950 shadow-[0_10px_20px_rgba(0,0,0,0.4)]'
-                : 'bg-white border-neutral-200 shadow-[0_10px_20px_rgba(0,0,0,0.15)]'
-              }
-    `}>
-              <div className="absolute top-2 left-3 w-4 h-2 bg-white/20 rounded-full rotate-[-35deg] pointer-events-none"></div>
-              <div className={`
-        text-3xl transition-all duration-500 transform
-        ${theme === 'dark' ? 'text-blue-400 rotate-0 scale-100' : 'text-yellow-500 rotate-[360deg] scale-110'}
-        group-hover:scale-125
-      `}>
-                <FontAwesomeIcon icon={theme === 'dark' ? faMoon : faSun} />
-              </div>
-
-              <div className="absolute inset-1 rounded-full border border-black/5 dark:border-white/5 pointer-events-none"></div>
-            </div>
-            <div className="absolute -bottom-2 w-12 h-4 bg-black/20 blur-md rounded-full -z-10 group-active:opacity-0 transition-opacity"></div>
-            <span className="absolute -bottom-8 font-mono text-[9px] uppercase tracking-widest opacity-30 font-bold dark:text-white">
-              {theme === 'dark' ? 'Night_Mag' : 'Day_Mag'}
-            </span>
-          </button>
-        </div>
+        
 
       </div>
 
-      {/* integrated components = vision board */}
-      <div className="max-w-[1600px] mx-auto flex flex-wrap gap-16 justify-center pb-32 justify-start items-start">
+      {/* integrated divs with all types of photos = vision board */}
+      <div className="max-w-[1600px] animate__animated animate__fadeIn animate__delay-1s mx-auto flex flex-wrap gap-8 md:gap-16 justify-center pb-32 justify-start items-start">
         {boardData.map(item => {
           if (item.type === 'polaroid') return <PolaroidItem key={item.id} data={item} onPlay={setPlayingVideoId} isPlaying={playingVideoId === item.id} />;
           if (item.type === 'film_strip') return <PhotoStripItem key={item.id} data={item} />;
           if (item.type === 'postcard') return <PostcardItem key={item.id} data={item} />;
-          if (item.type === 'lined_note') return <IDCard key={item.id} data={item} />;
+          if (item.type === 'lined_note') return <IDCard key={item.id} data={item} theme={theme} setTheme={setTheme} />;
           if (item.type === 'sticky') return <StickyItem key={item.id} data={item} />;
           if (item.type === 'skills_sticky') return <SkillSticky key={item.id} title={item.title} skills={item.skills} color={item.color} rotate={item.rotate} />;
           return null;
         })}
       </div>
 
-      <div id="Contact" className="w-full flex justify-center flex-col items-center py-20 px-4 relative">
+      {/* contact me postcard */}
+<div id="Contact" className="w-full flex justify-center flex-col items-center py-20 px-4 md:px-20 relative">
+  {/* washi tape */}
+  <div className="w-32 h-10 bg-blue-200/40 backdrop-blur-[2px] shadow-sm mb-[-15px] z-20 rotate-3 border-x border-blue-400/20"
+    style={{ clipPath: 'polygon(5% 0%, 95% 0%, 100% 50%, 95% 100%, 5% 100%, 0% 50%)' }}></div>
 
-        <div className="w-32 h-10 bg-blue-200/40 backdrop-blur-[2px] shadow-sm mb-[-15px] z-20 rotate-3 border-x border-blue-400/20"
-          style={{ clipPath: 'polygon(5% 0%, 95% 0%, 100% 50%, 95% 100%, 5% 100%, 0% 50%)' }}></div>
+  <div className="relative w-full max-w-[850px] aspect-auto md:aspect-[3/2] min-h-[600px] md:min-h-0">
 
-        <div className="relative w-full max-w-[850px] aspect-[3/2]">
+        {/* additional post cards in background */}
+    <div className="absolute inset-0 bg-[#f9f5eb] dark:bg-neutral-700 border border-neutral-300 dark:border-neutral-700 shadow-xl -rotate-1 md:-rotate-2 translate-x-2 md:translate-x-4 translate-y-2 z-0 opacity-60"></div>
+    <div className="absolute inset-0 bg-white dark:bg-neutral-600 border border-neutral-200 dark:border-neutral-700 shadow-lg rotate-1 -translate-x-1 md:-translate-x-2 -translate-y-1 z-0 opacity-40"></div>
 
-          {/* additional post card texture */}
-          <div className="absolute inset-0 bg-[#f9f5eb] dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 shadow-xl -rotate-2 translate-x-4 translate-y-2 z-0 opacity-60"></div>
-          <div className="absolute inset-0 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 shadow-lg rotate-1 -translate-x-2 -translate-y-1 z-0 opacity-40"></div>
+    <form ref={formRef} onSubmit={handleSubmit}
+      className="relative w-full h-full bg-[#fffcf5] dark:bg-[#E2E1DE] shadow-2xl border border-neutral-300 dark:border-neutral-400 p-6 md:p-8 flex flex-col md:flex-row gap-10 md:gap-8 overflow-hidden z-10">
 
-          <form ref={formRef} onSubmit={handleSubmit}
-            className="relative w-full h-full bg-[#fffcf5] dark:bg-neutral-900 shadow-2xl border border-neutral-300 dark:border-neutral-800 p-8 flex flex-col md:flex-row gap-8 overflow-hidden z-10">
+      {/* message side */}
+      <div className="flex-[1.2] flex flex-col min-h-[250px] md:min-h-0">
+        <div className="flex items-center gap-2 mb-4 opacity-40">
+          <FontAwesomeIcon icon={faQuoteLeft} className="text-xl dark:text-neutral-950" />
+          <span className="font-mono text-[10px] uppercase tracking-widest dark:text-neutral-950">
+            {isSent ? "Response" : "Message"}
+          </span>
+        </div>
 
-            {/* message side */}
-            <div className="flex-[1.2] flex flex-col">
-              <div className="flex items-center gap-2 mb-4 opacity-40">
-                <FontAwesomeIcon icon={faQuoteLeft} className="text-xl" />
-                <span className="font-mono text-[10px] uppercase tracking-widest">
-                  {isSent ? "Response" : "Message"}
-                </span>
-              </div>
-
-              {!isSent ? (
-                <textarea name="Subject" placeholder="Write your message..." required
-                  className="flex-1 w-full bg-transparent resize-none font-['Caveat'] text-2xl text-neutral-800 dark:text-neutral-200 focus:outline-none placeholder:opacity-20 leading-relaxed" />
-              ) : (
-                <div className="flex-1 flex flex-col justify-between">
-                  <div className="font-['Caveat'] text-3xl text-blue-600 dark:text-blue-400 leading-relaxed animate__animated animate__fadeIn">
-                    {replyText}
-                    {!isTypingFinished && <span className="animate-pulse border-r-2 border-blue-600 ml-1"></span>}
-                  </div>
-                  {isTypingFinished && (
-                    <button onClick={handleReset} className="self-start font-mono text-[11px] uppercase tracking-[0.3em] text-neutral-400 hover:text-blue-500 transition-all mt-4 animate__animated animate__fadeInUp flex items-center gap-2">
-                      <i className="fa-solid fa-pencil text-lg"></i> Send Another
-                    </button>
-                  )}
-                </div>
-              )}
+        {!isSent ? (
+          <textarea name="Subject" placeholder="Write your message..." required
+            className="flex-1 w-full placeholder-neutral-900 bg-transparent resize-none font-['Caveat'] text-2xl text-neutral-800 dark:text-neutral-900 focus:outline-none placeholder:opacity-20 dark:placeholder-opacity-1000 leading-relaxed" />
+        ) : (
+          <div className="flex-1 flex flex-col justify-between">
+            <div className="font-['Caveat'] text-2xl md:text-3xl text-blue-600 dark:text-blue-700 leading-relaxed animate__animated animate__fadeIn">
+              {replyText}
+              {!isTypingFinished && <span className="animate-pulse border-r-2 border-blue-600 ml-1"></span>}
             </div>
+            {isTypingFinished && (
+              <button onClick={handleReset} className="self-start font-mono text-[11px] uppercase tracking-[0.3em] text-neutral-400 hover:text-blue-500 transition-all mt-4 animate__animated animate__fadeInUp flex items-center gap-2">
+                <i className="fa-solid fa-pencil text-lg"></i> Send Another
+              </button>
+            )}
+          </div>
+        )}
+      </div>
 
-            {/* divider */}
-            <div className="hidden md:block w-[2px] bg-neutral-200 dark:bg-neutral-800 h-full relative">
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#fffcf5] dark:bg-neutral-900 py-4 font-mono text-[8px] rotate-90 text-neutral-300 uppercase tracking-[0.5em]">Postcard</div>
+      {/* divider */}
+      <div className="w-full md:w-[2px] h-[2px] md:h-full border-t-2 md:border-t-0 md:border-l-2 border-dashed border-neutral-200 dark:border-neutral-300 relative"/>
+
+      {/* address/sender side */}
+      <div className="flex-1 flex flex-col justify-between gap-8 md:gap-0">
+        {/*stamp */}
+        <div className="self-end w-15 h-20 lg:w-20 lg:h-28 border-2 border-red-500/30 dark:border-red-500/20 border-double flex flex-col items-center justify-center p-2 relative shrink-0">
+          <div className="text-[9px] font-black text-red-600 uppercase text-center leading-none">Shriya<br />Biddala</div>
+          {isSent && (
+            <div className="absolute inset-0 flex items-center justify-center rotate-12 animate__animated animate__zoomIn">
+              <div className="border-2 border-blue-600/40 rounded-full px-2 py-1 text-[8px] font-black text-blue-600/40 uppercase">DISPATCHED</div>
             </div>
+          )}
+        </div>
 
-            {/* address side */}
-            <div className="flex-1 flex flex-col justify-between">
-              <div className="self-end w-24 h-28 border-2 border-red-500/30 border-double flex flex-col items-center justify-center p-2 relative">
-                <div className="text-[10px] font-black text-red-600 uppercase text-center leading-none">Shriya<br />Biddala</div>
-                <div className="w-full h-[1px] bg-red-500/20 my-2"></div>
-                <span className="text-[8px] font-mono text-neutral-400">ANN ARBOR, MI</span>
-                {isSent && (
-                  <div className="absolute inset-0 flex items-center justify-center rotate-12 animate__animated animate__zoomIn">
-                    <div className="border-2 border-blue-600/40 rounded-full px-2 py-1 text-[8px] font-black text-blue-600/40 uppercase">DISPATCHED</div>
-                  </div>
-                )}
+        <div className="space-y-8 md:space-y-10 relative">
+          {!isSent ? (
+            <>
+              <div className="relative border-b border-neutral-300 dark:border-neutral-700 pb-1">
+                <span className="absolute -top-4 left-0 text-[8px] font-mono uppercase text-neutral-400 dark:text-neutral-500 tracking-widest">To</span>
+                <p className="font-['Caveat'] text-2xl text-black opacity-70 dark:text-black">Shriya Biddala</p>
               </div>
-
-              <div className="space-y-10 relative">
-                {!isSent ? (
-                  <>
-                    <div className="relative border-b border-neutral-300 dark:border-neutral-700 pb-1">
-                      <span className="absolute -top-4 left-0 text-[8px] font-mono uppercase text-neutral-400 tracking-widest">To</span>
-                      <p className="font-['Caveat'] text-2xl opacity-30">Shriya Biddala</p>
-                    </div>
-                    <div className="relative">
-                      <input type="text" name="Name" placeholder="Your Name" required
-                        className="w-full bg-transparent border-b border-neutral-300 dark:border-neutral-700 py-1 focus:border-blue-500 outline-none transition-colors font-['Caveat'] text-2xl text-neutral-800 dark:text-neutral-200 placeholder:opacity-20" />
-                      <span className="absolute -top-4 left-0 text-[8px] font-mono uppercase text-neutral-400 tracking-widest">From</span>
-                    </div>
-                    <div className="relative">
-                      <input type="email" name="Email" placeholder="Your Email" required
-                        className="w-full bg-transparent border-b border-neutral-300 dark:border-neutral-700 py-1 focus:border-blue-500 outline-none transition-colors font-['Caveat'] text-2xl text-neutral-800 dark:text-neutral-200 placeholder:opacity-20" />
-                      <span className="absolute -top-4 left-0 text-[8px] font-mono uppercase text-neutral-400 tracking-widest">Reply-To</span>
-                    </div>
-                    <button type="submit" className="w-full bg-blue-600 dark:bg-white text-white dark:text-black font-black py-4 uppercase text-[10px] tracking-widest hover:bg-blue-400 hover:text-white transition-all shadow-xl flex items-center justify-center gap-2">
-                      <i className="fa-solid fa-paper-plane"></i> Post Message
-                    </button>
-                  </>
-                ) : (
-                  <div className="animate__animated animate__fadeIn">
-                    <div className="relative border-b border-neutral-300 dark:border-neutral-700 pb-1 mb-6">
-                      <span className="absolute -top-4 left-0 text-[8px] font-mono uppercase text-blue-500 tracking-widest font-bold">To</span>
-                      <p className="font-['Caveat'] text-3xl text-neutral-800 dark:text-white">{userData.name}</p>
-                    </div>
-                    <div className="relative border-b border-neutral-300 dark:border-neutral-700 pb-1 mb-6">
-                      <span className="absolute -top-4 left-0 text-[8px] font-mono uppercase text-neutral-400 tracking-widest">Location</span>
-                      <p className="font-['Caveat'] text-3xl text-neutral-800 dark:text-white">{userData.email}</p>
-                    </div>
-                    <div className="relative border-b border-neutral-300 dark:border-neutral-700 pb-1">
-                      <span className="absolute -top-4 left-0 text-[8px] font-mono uppercase text-neutral-400 tracking-widest">From</span>
-                      <p className="font-['Caveat'] text-3xl text-blue-600 dark:text-blue-400 italic">Shriya Biddala</p>
-                    </div>
-                  </div>
-                )}
+              <div className="relative">
+                <input type="text" name="Name" placeholder="Your Name" required
+                  className="w-full bg-transparent placeholder-neutral-900 border-b border-neutral-300 dark:border-neutral-700 py-1 focus:border-blue-500 outline-none transition-colors font-['Caveat'] text-2xl text-neutral-800 dark:text-neutral-900 placeholder:opacity-30" />
+                <span className="absolute -top-4 left-0 text-[8px] font-mono uppercase text-neutral-400 dark:text-neutral-500 tracking-widest">From</span>
+              </div>
+              <div className="relative">
+                <input type="email" name="Email" placeholder="Your Email" required
+                  className="w-full bg-transparent placeholder-neutral-900 border-b border-neutral-300 dark:border-neutral-700 py-1 focus:border-blue-500 outline-none transition-colors font-['Caveat'] text-2xl text-neutral-800 dark:text-neutral-900 placeholder:opacity-30" />
+                <span className="absolute -top-4 left-0 text-[8px] font-mono uppercase text-neutral-400 dark:text-neutral-500 tracking-widest">Reply-To</span>
+              </div>
+              <button type="submit" className="w-full placeholder-neutral-900 bg-blue-400 dark:bg-blue-500 text-white dark:text-white font-black py-2 uppercase text-[10px] tracking-widest hover:bg-blue-400 hover:text-white transition-all shadow-xl flex items-center justify-center gap-2">
+                <i className="fa-solid fa-paper-plane"></i> Post Message
+              </button>
+            </>
+          ) : (
+            <div className="animate__animated animate__fadeIn space-y-6">
+              <div className="relative border-b border-neutral-300 dark:border-neutral-400 pb-1">
+                <span className="absolute -top-4 left-0 text-[8px] font-mono uppercase text-neutral-400 dark:text-neutral-500 tracking-widest font-bold">To</span>
+                <p className="font-['Caveat'] text-2xl md:text-3xl text-neutral-800 dark:text-neutral-900">{userData.name}</p>
+              </div>
+              <div className="relative border-b border-neutral-300 dark:border-neutral-400 pb-1">
+                <span className="absolute -top-4 left-0 text-[8px] font-mono uppercase text-neutral-400 dark:text-neutral-500 tracking-widest">Email</span>
+                <p className="font-['Caveat'] text-xl md:text-3xl text-neutral-800 dark:text-neutral-900 truncate">{userData.email}</p>
+              </div>
+              <div className="relative border-b border-neutral-300 dark:border-neutral-400 pb-1">
+                <span className="absolute -top-4 left-0 text-[8px] font-mono uppercase text-neutral-400 dark:text-neutral-500 tracking-widest">From</span>
+                <p className="font-['Caveat'] text-2xl md:text-3xl text-blue-600 dark:text-blue-700 italic">Shriya Biddala</p>
               </div>
             </div>
-          </form>
+          )}
         </div>
       </div>
+    </form>
+  </div>
+</div>
 
     </div>
 

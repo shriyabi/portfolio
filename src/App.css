@@ -153,3 +153,57 @@
 .animate-ink-bleed {
   animation: inkBleed 4s ease-in-out infinite;
 }
+
+.id_card_size{
+  width: 520px; 
+  height: 390px;   
+}
+
+.board-item-shadow:hover {
+  box-shadow: 12px 20px 40px rgba(0, 0, 0, 0.3);
+  transform: translateY(-4px) scale(1.02);
+}
+
+.dark .board-item-shadow:hover {
+  box-shadow: 12px 20px 40px rgba(0, 0, 0, 0.6);
+  transform: translateY(-4px) scale(1.02);
+}
+
+.dark .shadow-2xl, .dark .shadow-xl {
+  box-shadow: 6px 10px 30px rgba(0, 0, 0, 0.5) !important;
+}
+
+.dark .text-neutral-900, 
+.dark .text-neutral-800, 
+.dark .text-neutral-700 {
+  color: #1a1a1a !important;
+}
+
+.corkboard {
+  background-image: url("https://www.transparenttextures.com/patterns/p6.png"); 
+  position: relative;
+}
+
+.dark .corkboard::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  /* Top left light looking down */
+  background: radial-gradient(
+    circle at 20% 20%, 
+    rgba(255, 250, 230, 0.12) 0%, 
+    rgba(36, 27, 21, 0.2) 50%,
+    rgba(20, 15, 10, 0.6) 100% 
+  );
+  pointer-events: none;
+  z-index: 5;
+}
+
+.corkboard::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle, transparent 40%, rgba(0,0,0,0.15) 100%);
+  pointer-events: none;
+  z-index: 1;
+}
