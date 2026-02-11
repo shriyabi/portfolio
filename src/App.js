@@ -293,10 +293,10 @@ const PostcardItem = ({ data }) => {
             <span className="text-[6px]">2026</span>
           </div>
         </div>
-        <div className="flex-1 flex items-center justify-between md:px-2">
+        <div className="flex-1 flex items-center justify-between mt-5 md:px-2 ">
           {/* postcard info */}
           <div>
-            <h2 className="text-[12px] md:text-xl font-black text-black uppercase leading-none truncate">{data.title}</h2>
+            <h2 className="text-[12px] md:text-xl font-black text-black uppercase leading-none mb-3 truncate">{data.title}</h2>
             <h3 className="font-['Caveat'] text-[1em] md:text-2xl text-blue-600 dark:text-blue-500 font-bold leading-none mt-1">{data.role}</h3>
           </div>
         </div>
@@ -1058,10 +1058,10 @@ export default function App() {
             }}
           />
           <h1 className="relative z-10 text-5xl md:text-7xl font-black italic tracking-tighter uppercase leading-none text-black dark:text-white">
-            shriya's <span className="text-blue-600 relative">bulletin</span> board
+            shriya's <span className="text-blue-600 dark:text-blue-400 relative">bulletin</span> board
           </h1>
-          <p className="font-['Caveat'] text-xl md:text-3xl text-neutral-500 dark:text-neutral-400 mt-4 italic animate__animated animate__fadeIn flex items-center gap-3">
-            <span className="h-[1px] w-8 bg-neutral-400 dark:bg-neutral-100 dark:bg-neutral-700 block"></span>
+          <p className="font-['Caveat'] text-xl md:text-3xl text-neutral-500 dark:text-neutral-200 mt-4 italic animate__animated animate__fadeIn flex items-center gap-3">
+            <span className="h-[1px] w-8 bg-neutral-400 dark:bg-neutral-100 dark:text-slate-50 block"></span>
             "Be the change you wish to see in the world..."
           </p>
         </div>
@@ -1132,10 +1132,10 @@ export default function App() {
       <div className="flex-1 flex flex-col justify-between gap-8 md:gap-0">
         {/*stamp */}
         <div className="self-end w-15 h-20 lg:w-20 lg:h-28 border-2 border-red-500/30 dark:border-red-500/20 border-double flex flex-col items-center justify-center p-2 relative shrink-0">
-          <div className="text-[9px] font-black text-red-600 uppercase text-center leading-none">Shriya<br />Biddala</div>
+          <div className={`text-[9px] font-black ${isSent ? 'text-red-600/40' : 'text-red-600'} uppercase text-center leading-none`}>Shriya<br />Biddala</div>
           {isSent && (
             <div className="absolute inset-0 flex items-center justify-center rotate-12 animate__animated animate__zoomIn">
-              <div className="border-2 border-blue-600/40 rounded-full px-2 py-1 text-[8px] font-black text-blue-600/40 uppercase">DISPATCHED</div>
+              <div className="border-2 border-blue-600/40 rounded-full px-2 py-1 text-[8px] font-black text-blue-600 uppercase">DISPATCHED</div>
             </div>
           )}
         </div>
