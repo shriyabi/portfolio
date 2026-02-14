@@ -538,9 +538,19 @@ useEffect(() => {
       {/* dark/light mode magnet */}
       <div className="absolute -top-6 -right-1 md:-right-6 z-50 transition-transform duration-300 group-hover:scale-110">
         <button
-          onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-          className="group relative w-10 h-10 md:w-20 md:h-20 flex items-center justify-center outline-none"
-        >
+  onClick={() => {
+    const isSystemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    
+    // Determine current look regardless of source
+    const currentLook = theme === 'system' 
+      ? (isSystemDark ? 'dark' : 'light') 
+      : theme;
+
+    // Toggle to the explicit opposite (overriding system)
+    setTheme(currentLook === 'dark' ? 'light' : 'dark');
+  }}
+  className="group relative w-10 h-10 md:w-20 md:h-20 flex items-center justify-center outline-none"
+>
           <div className={`
             absolute inset-0 rounded-full transition-all duration-300
             border-b-4 active:border-b-0 active:translate-y-1
@@ -847,7 +857,8 @@ const FallingSticky = ({ isExiting, onClose }) => {
 
 export default function App() {
   const [playingVideoId, setPlayingVideoId] = useState(null);
-  const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light');
+  //const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light');
+  const [theme, setTheme] = useState('system'); 
   const formRef = useRef(null);
   const [isSent, setIsSent] = useState(false);
   const [replyText, setReplyText] = useState("");
@@ -872,7 +883,7 @@ export default function App() {
   };
   
 
-  
+  //form submit
   const handleSubmit = (e) => {
     e.preventDefault();
     const formData = new FormData(formRef.current);
@@ -922,6 +933,7 @@ export default function App() {
       });
   };
 
+  //form reset
   const handleReset = () => {
     setIsSent(false);
     setReplyText("");
@@ -930,12 +942,18 @@ export default function App() {
     if (formRef.current) formRef.current.reset();
   };
 
-
-  useEffect(() => {
-    const root = window.document.documentElement;
-    theme === 'dark' ? root.classList.add('dark') : root.classList.remove('dark');
-    localStorage.setItem('theme', theme);
-  }, [theme]);
+//dark/light mode use effect
+ useEffect(() => {
+  const root = window.document.documentElement;
+  const isSystemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const shouldBeDark = theme === 'dark' || (theme === 'system' && isSystemDark);
+  if (shouldBeDark) {
+    root.classList.add('dark');
+  } else {
+    root.classList.remove('dark');
+  }
+  //localStorage.setItem('theme', theme); //persistence of theme
+}, [theme]);
   // need to override this w the button magnet
 
   //board data
@@ -1276,7 +1294,7 @@ export default function App() {
   }
 `}</style>
 
-${console.log("1289", isExiting)}
+{console.log("1289", isExiting)}
 
           {/* highlighter */}
           <div
