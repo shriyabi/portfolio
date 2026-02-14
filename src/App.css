@@ -146,6 +146,7 @@
   50% { transform: scaleY(1.05) rotate(-0.5deg); }
 }
 
+
 .animate-draw-highlight {
   animation: drawHighlight 0.8s cubic-bezier(0.65, 0, 0.35, 1) forwards;
 }
@@ -206,4 +207,53 @@
   background: radial-gradient(circle, transparent 40%, rgba(0,0,0,0.15) 100%);
   pointer-events: none;
   z-index: 1;
+}
+
+.path-animate {
+  stroke-dasharray: 200;
+  stroke-dashoffset: 200;
+  animation: drawPath 1.5s ease-out forwards;
+}
+@keyframes drawPath {
+  to { stroke-dashoffset: 0; }
+}
+
+
+/* entrace: fall down; large to small*/
+@keyframes stickyReversePop {
+  0% { 
+    transform: scale(2.5) rotate(10deg); 
+    filter: blur(10px); 
+    opacity: 0; 
+  }
+  100% { 
+    transform: scale(1) rotate(-2deg); 
+    filter: blur(0px); 
+    opacity: 1; 
+  }
+}
+
+/* peeling sticky */
+.sticky-peel-exit {
+  pointer-events: none;
+  transform-origin: top left; 
+  animation: stickyPeelTopLeft 0.7s ease-in forwards !important;
+}
+
+/* 3. peeling and moving top left animation */
+@keyframes stickyPeelTopLeft{
+  0% { 
+    transform: scale(1) rotate(-2deg);
+    opacity: 1;
+  }
+  20% {
+    /* peel */
+    transform: scale(1.05) rotate(-8deg);
+    opacity: 1;
+  }
+  100% { 
+    /* fly away */
+    transform: translate(-150vw, -150vh) rotate(-45deg) scale(0.2); 
+    opacity: 0; 
+  }
 }

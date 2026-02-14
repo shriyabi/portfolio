@@ -436,7 +436,81 @@ const StickyItem = ({ data }) => (
   </div>
 );
 
-const IDCard = ({ data, theme, setTheme }) => {
+const IDCard = ({ data, theme, setTheme, time, isStickyClosed }) => {
+  const [showGuide, setShowGuide] = useState(false);
+  console.log("sticky closed", isStickyClosed); 
+console.log("442", showGuide); 
+useEffect(() => {
+  const hasSeen = sessionStorage.getItem('visited_id_guide');
+  console.log("445", hasSeen); 
+  if (!hasSeen && isStickyClosed) setShowGuide(true); 
+
+  console.log("447", showGuide); 
+
+  const clearGuide = () => {
+    setShowGuide((prev) => {
+      if (prev) {
+        sessionStorage.setItem('visited_id_guide', 'true');
+      }
+      return false;
+    });
+  };
+
+  if (isStickyClosed && !hasSeen) {
+    console.log("460")
+    const timeout = setTimeout(() => {
+      window.addEventListener('scroll', clearGuide);
+      window.addEventListener('mousedown', clearGuide);
+    }, 700);
+
+    return () => {
+      clearTimeout(timeout);
+      window.removeEventListener('scroll', clearGuide);
+      window.removeEventListener('mousedown', clearGuide);
+    };
+  }
+}, [isStickyClosed]); 
+
+
+  console.log("cryy", showGuide, isStickyClosed); 
+
+  const OnboardingGuide = ({ isVisible, time }) => {
+    if (!isVisible) return null;
+
+    return (
+      <>
+        {/* dark/light mode hint */}
+        <div className="absolute -top-20 md:-top-24 -right-0 md:-right-4 z-[60] w-auto pointer-events-none animate__animated animate__fadeInDown">
+  <p className="font-['Caveat'] text-lg md:text-2xl text-red-600 dark:text-blue-400 -rotate-3 leading-tight text-right pr-2">
+    <span className="relative inline-block px-1">
+      {/* //highligher */}
+      <span 
+        className="absolute inset-0 bg-yellow-300/60 dark:bg-yellow-400/20 -rotate-1 translate-y-1"
+        style={{
+          borderRadius: '20% 80% 15% 85% / 95% 15% 85% 5%',
+          clipPath: 'inset(0 100% 0 0)',
+          animation: 'highlightStroke 0.6s ease-out 1.2s forwards',
+          animationDelay:`${0.7 + time}s`
+        }}
+      ></span>
+      <span className="relative z-10 text-red-600 dark:text-red-400"> Note: Click the magnet for Dark Mode</span>
+    </span>
+  </p>
+   {/* handdrawn arrow */}
+  <svg 
+    viewBox="0 0 100 80" 
+    className="w-14 h-14 md:w-20 md:h-20 ml-auto mt-[-5px] fill-none stroke-blue-500/70 dark:stroke-blue-400/60 stroke-[4] stroke-linecap-round"
+  >
+    <path 
+      className="path-animate" 
+      d="M20,10 C35,10 70,15 85,55 M75,45 L85,55 L95,45" 
+    />
+  </svg>
+</div>
+
+      </>
+    );
+  };
 
   const allCourses = [
     { id: "281", name: "Data Structures & Alg" },
@@ -457,120 +531,110 @@ const IDCard = ({ data, theme, setTheme }) => {
   ];
 
   return (
-    <div className="relative inline-block group w-[520px] h-[250px] md:w-[520px] md:h-[390px]">
-  
-  {/* dark/light mode magnet  { width: '520px', height: '390px' } style={{ width: '520px', height: '250px' }} */}
-  <div className="absolute -top-6 -right-1 md:-right-6 z-50 transition-transform duration-300 group-hover:scale-110">
-    <button
-      onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-      className="group relative w-10 h-10 md:w-20 md:h-20 flex items-center justify-center outline-none"
-    >
-      <div className={`
-        absolute inset-0 rounded-full transition-all duration-300
-        border-b-4 active:border-b-0 active:translate-y-1
-        flex items-center justify-center
-        ${theme === 'dark'
-          ? 'bg-neutral-800 border-neutral-950 shadow-[0_10px_20px_rgba(0,0,0,0.5)]'
-          : 'bg-white border-neutral-200 shadow-[0_10px_20px_rgba(0,0,0,0.2)]'
-        }
-      `}>
-        <div className="absolute top-2 left-3 w-2 h-1 md:w-4 h-2 bg-white/20 rounded-full rotate-[-35deg] pointer-events-none"></div>
-        <div className={`
-          md:text-3xl transition-all duration-500 transform
-          ${theme === 'dark' ? 'text-blue-400 rotate-0 scale-100' : 'text-yellow-500 rotate-[360deg] scale-110'}
-          group-hover:scale-125
-        `}>
-          <FontAwesomeIcon icon={theme === 'dark' ? faMoon : faSun} />
-        </div>
-        <div className="absolute inset-1 rounded-full border border-black/5 dark:border-white/5 pointer-events-none"></div>
-      </div>
-      <div className="absolute -bottom-1 w-6 h-3 md:w-12 h-4 bg-black/40 blur-md rounded-full -z-10"></div>
-    </button>
-  </div>
+    <div className="relative inline-block group w-[325px] h-[250px] md:w-[520px] md:h-[390px]">
+      
+      <OnboardingGuide isVisible={showGuide} time={time} />
 
-  {/* 2026 overlay */}
-  <div className="absolute right-1 md:right-4 top-14 md:top-10 md:bottom-10 z-30 flex flex-col justify-center items-center pointer-events-none">
-     <div className="flex flex-col md:gap-4 font-sans font-extrabold text-3xl font-black text-blue-900/20 dark:text-blue-700/20 select-none">
-        <span>2</span>
-        <span>0</span>
-        <span>2</span>
-        <span>6</span>
-     </div>
-  </div>
-
-  <div
-    className={`bg-white dark:bg-[#E8E8E8] shadow-2xl shadow-black/50 relative transition-all duration-500 hover:scale-[1.01] ${data.rotate} border-t-[14px] border-blue-900 dark:border-blue-700 rounded-xl overflow-hidden h-full w-full`}
-  >
-    <div className="py-2 px-3 md:px-5 relative z-10 h-full flex flex-col">
-      {/* top border w school info */}
-      <div className="flex justify-between items-start mb-3">
-        <div className="flex flex-col">
-          <h3 className="text-xs md:text-xl font-black text-blue-900 tracking-tighter leading-none uppercase">
-            University of Michigan
-          </h3>
-          <span className="text-[8px] md:text-[10px] font-mono font-bold text-neutral-400 dark: text-neutral-500 uppercase tracking-widest mt-1">
-            Ann Arbor, MI • College of Engineering
-          </span>
-        </div>
-        <div className="text-right md:mr-8"> 
-          <span className="bg-blue-900 text-yellow-400 px-1 py-1 md:px-3 text-[6px] md:text-[10px] font-black rounded italic shadow-sm">
-            CLASS OF 2026
-          </span>
-        </div>
-      </div>
-
-      {/* top half of card */}
-      <div className="flex gap-6 md:mb-3">
-        <div className="w-14 h-14 md:w-28 md:h-28 bg-neutral-100 dark:bg-neutral-200 border-2 border-neutral-200 dark:border-neutral-300 rounded-lg overflow-hidden grayscale flex-shrink-0 shadow-inner">
-          <img src={shriya} className="w-full h-full object-cover" alt="id-photo" />
-        </div>
-        <div className="flex flex-col justify-center flex-1">
-          <div className="md:mb-3">
-            <h4 className="text-base md:text-3xl font-black italic uppercase text-neutral-800 leading-none">
-              Shriya Biddala
-            </h4>
-            <p className="text-blue-600 text-[8px] md:text-[11px] font-bold uppercase tracking-tight">
-              B.S.E. Computer Science Engineering
-            </p>
-          </div>
-          <div className="flex flex-wrap gap-x-3 md:gap-y-1 opacity-70">
-            {activities.map((act, i) => (
-              <span key={i} className="text-[6px] md:text-[8px] font-bold text-neutral-600 dark:text-neutral-700 uppercase italic">• {act}</span>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* bottom half of ccard */}
-      <div className="flex-1 border-t border-neutral-100 dark:border-neutral-400 pt-2">
-        <h5 className="text-[5px] md:text-[9px] font-black text-blue-900 uppercase mb-2 tracking-[0.2em] flex items-center gap-2">
-          <div className="w-1 h-1 md:w-2 md:h-2 bg-yellow-400 rounded-full"></div>
-          Coursework Inventory
-        </h5>
-        <div className="grid grid-cols-2 md:gap-x-10 md:gap-y-2">
-          {allCourses.map((course, i) => (
-            <div key={i} className="flex flex-col">
-              <span className="text-[6px] md:text-[8px] font-mono font-black text-blue-600 leading-none uppercase">EECS {course.id}</span>
-              <span className="text-[8px] md:text-[10px] font-bold text-neutral-700 uppercase leading-tight truncate">{course.name}</span>
+      {/* dark/light mode magnet */}
+      <div className="absolute -top-6 -right-1 md:-right-6 z-50 transition-transform duration-300 group-hover:scale-110">
+        <button
+          onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+          className="group relative w-10 h-10 md:w-20 md:h-20 flex items-center justify-center outline-none"
+        >
+          <div className={`
+            absolute inset-0 rounded-full transition-all duration-300
+            border-b-4 active:border-b-0 active:translate-y-1
+            flex items-center justify-center
+            ${theme === 'dark'
+              ? 'bg-neutral-800 border-neutral-950 shadow-[0_10px_20px_rgba(0,0,0,0.5)]'
+              : 'bg-white border-neutral-200 shadow-[0_10px_20px_rgba(0,0,0,0.2)]'
+            }
+          `}>
+            <div className="absolute top-2 left-3 w-2 h-1 md:w-4 h-2 bg-white/20 rounded-full rotate-[-35deg] pointer-events-none"></div>
+            <div className={`
+              md:text-3xl transition-all duration-500 transform
+              ${theme === 'dark' ? 'text-blue-400 rotate-0 scale-100' : 'text-yellow-500 rotate-[360deg] scale-110'}
+              group-hover:scale-125
+            `}>
+              <FontAwesomeIcon icon={theme === 'dark' ? faMoon : faSun} />
             </div>
-          ))}
+            <div className="absolute inset-1 rounded-full border border-black/5 dark:border-white/5 pointer-events-none"></div>
+          </div>
+          <div className="absolute -bottom-1 w-6 h-3 md:w-12 h-4 bg-black/40 blur-md rounded-full -z-10"></div>
+        </button>
+      </div>
+
+      {/* 2026 overlay */}
+      <div className="absolute right-1 md:right-4 top-14 md:top-10 md:bottom-10 z-30 flex flex-col justify-center items-center pointer-events-none">
+        <div className="flex flex-col md:gap-4 font-sans font-extrabold text-3xl font-black text-blue-900/20 dark:text-blue-700/20 select-none">
+          <span>2</span><span>0</span><span>2</span><span>6</span>
         </div>
       </div>
 
-      <div className="absolute bottom-0 left-0 w-full">
-        <div className="h-5 md:h-10 bg-neutral-50 dark:bg-neutral-300 flex items-center px-4 md:px-6 gap-2 md:gap-4 border-t border-neutral-200 dark:border-neutral-800">
-          <div className="flex-1 h-4 flex gap-[1px] opacity-30">
-            {[...Array(60)].map((_, i) => (
-              <div key={i} className={`h-full bg-black ${Math.random() > 0.6 ? 'w-[2px]' : 'w-[1px]'}`}></div>
-            ))}
+      {/* ID Card Body */}
+      <div
+        className={`bg-white dark:bg-[#E8E8E8] shadow-2xl shadow-black/50 relative transition-all duration-500 hover:scale-[1.01] ${data.rotate} border-t-[14px] border-blue-900 dark:border-blue-700 rounded-xl overflow-hidden h-full w-full`}
+      >
+        <div className="py-2 px-3 md:px-5 relative z-10 h-full flex flex-col">
+          {/* Header */}
+          <div className="flex justify-between items-start mb-3">
+            <div className="flex flex-col">
+              <h3 className="text-xs md:text-xl font-black text-blue-900 tracking-tighter leading-none uppercase">University of Michigan</h3>
+              <span className="text-[8px] md:text-[10px] font-mono font-bold text-neutral-400 dark:text-neutral-500 uppercase tracking-widest mt-1">Ann Arbor, MI • College of Engineering</span>
+            </div>
+            <div className="text-right md:mr-8"> 
+              <span className="bg-blue-900 text-yellow-400 px-1 py-1 md:px-3 text-[6px] md:text-[10px] font-black rounded italic shadow-sm">CLASS OF 2026</span>
+            </div>
           </div>
-          <span className="text-[6px] md:text-[9px] font-mono font-bold tracking-[0.4em] text-neutral-400 uppercase">CERT_ID_EECS_2026</span>
+
+          {/* Profile Section */}
+          <div className="flex gap-6 md:mb-3">
+            <div className="w-14 h-14 md:w-28 md:h-28 bg-neutral-100 dark:bg-neutral-200 border-2 border-neutral-200 dark:border-neutral-300 rounded-lg overflow-hidden grayscale flex-shrink-0 shadow-inner">
+              <img src={shriya} className="w-full h-full object-cover" alt="id-photo" />
+            </div>
+            <div className="flex flex-col justify-center flex-1">
+              <div className="md:mb-3">
+                <h4 className="text-base md:text-3xl font-black italic uppercase text-neutral-800 leading-none">Shriya Biddala</h4>
+                <p className="text-blue-600 text-[8px] md:text-[11px] font-bold uppercase tracking-tight">B.S.E. Computer Science Engineering</p>
+              </div>
+              <div className="flex flex-wrap gap-x-3 md:gap-y-1 opacity-70">
+                {activities.map((act, i) => (
+                  <span key={i} className="text-[6px] md:text-[8px] font-bold text-neutral-600 dark:text-neutral-700 uppercase italic">• {act}</span>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Coursework */}
+          <div className="flex-1 border-t border-neutral-100 dark:border-neutral-400 pt-2">
+            <h5 className="text-[5px] md:text-[9px] font-black text-blue-900 uppercase mb-2 tracking-[0.2em] flex items-center gap-2">
+              <div className="w-1 h-1 md:w-2 md:h-2 bg-yellow-400 rounded-full"></div>Coursework Inventory
+            </h5>
+            <div className="grid grid-cols-2 md:gap-x-10 md:gap-y-2">
+              {allCourses.map((course, i) => (
+                <div key={i} className="flex flex-col">
+                  <span className="text-[6px] md:text-[8px] font-mono font-black text-blue-600 leading-none uppercase">EECS {course.id}</span>
+                  <span className="text-[8px] md:text-[10px] font-bold text-neutral-700 uppercase leading-tight truncate">{course.name}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Barcode Footer */}
+          <div className="absolute bottom-0 left-0 w-full">
+            <div className="h-5 md:h-10 bg-neutral-50 dark:bg-neutral-300 flex items-center px-4 md:px-6 gap-2 md:gap-4 border-t border-neutral-200 dark:border-neutral-800">
+              <div className="flex-1 h-4 flex gap-[1px] opacity-30">
+                {[...Array(60)].map((_, i) => (
+                  <div key={i} className={`h-full bg-black ${Math.random() > 0.6 ? 'w-[2px]' : 'w-[1px]'}`}></div>
+                ))}
+              </div>
+              <span className="text-[6px] md:text-[9px] font-mono font-bold tracking-[0.4em] text-neutral-400 uppercase">CERT_ID_EECS_2026</span>
+            </div>
+            <div className="h-1.5 bg-gradient-to-r from-blue-900 via-yellow-400 to-blue-900"></div>
+          </div>
         </div>
-        <div className="h-1.5 bg-gradient-to-r from-blue-900 via-yellow-400 to-blue-900"></div>
       </div>
     </div>
-  </div>
-</div>
   );
 };
 
@@ -620,7 +684,7 @@ const SkillSticky = ({ title, skills, color, rotate }) => {
 
 const BlueWashiTape = ({ className }) => (
   <div
-    className={`absolute w-24 h-8 bg-blue-400/30 dark:bg-blue-500/60 backdrop-blur-[1px] z-30 border-x border-white/10 pointer-events-none ${className}`}
+    className={`absolute w-24 h-8 bg-blue-400/30 dark:bg-blue-400/60 backdrop-blur-[1px] z-30 border-x border-white/10 pointer-events-none ${className}`}
     style={{
       clipPath: 'polygon(5% 0%, 95% 2%, 100% 50%, 95% 98%, 5% 100%, 0% 50%)',
     }}
@@ -639,6 +703,148 @@ const Pushpin = () => (
   </>
 );
 
+const IdleScrollIndicator = ({ isStickyDismissed, delayMs }) => {
+  const [isIdle, setIsIdle] = useState(false);
+
+  useEffect(() => {
+    //wait until sticky is lost
+    if (!isStickyDismissed) return;
+
+    let idleTimer;
+
+    const startInactivityTimer = (customDelay) => {
+      if (idleTimer) clearTimeout(idleTimer);
+      
+      idleTimer = setTimeout(() => {
+        const totalHeight = document.documentElement.scrollHeight;
+        const currentPosition = window.innerHeight + window.scrollY;
+        //keep showing keep scrolling if user has no activity after 5 seconds
+        if (currentPosition < totalHeight - 100) {
+          setIsIdle(true);
+        }
+      }, 5000);
+    };
+
+    const initialWait = 700 + delayMs + 5000;
+    startInactivityTimer(initialWait);
+
+    const handleScroll = () => {
+      //unidle if scroll
+      setIsIdle(false);
+      startInactivityTimer(5000); 
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    
+    return () => {
+      clearTimeout(idleTimer);
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, [isStickyDismissed, delayMs]);
+
+  return (
+    <div 
+      className={`fixed w-full z-50 bottom-10 pr-8 flex flex-col items-center transition-all duration-1000 ${
+        isIdle ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10 pointer-events-none'
+      }`}
+    >
+      <div className="animate-bounce flex flex-col items-center">
+        <div className="w-auto relative inline-block px-2">
+          <span 
+            className="absolute inset-0 bg-yellow-300/70 -rotate-1 translate-y-1"
+            style={{
+              borderRadius: '20% 80% 15% 85% / 95% 15% 85% 5%',
+              clipPath: 'inset(0 100% 0 0)',
+              animation: isIdle ? 'highlightStroke 1.2s ease-out forwards' : 'none',
+              filter: 'blur(0.5px)'
+            }}
+          ></span>
+          <span className="relative z-10 mx-1 my-1 font-['Caveat'] text-2xl md:text-3xl text-red-600 italic">
+            Keep exploring...
+          </span>
+        </div>
+        <i className="fa-solid fa-chevron-down text-red-500 text-3xl mt-2"></i>
+      </div>
+    </div>
+  );
+};
+
+const FallingSticky = ({ isExiting, onClose }) => {
+  useEffect(() => {
+    const handleGlobalInteraction = () => onClose();
+    window.addEventListener('scroll', handleGlobalInteraction);
+    window.addEventListener('wheel', handleGlobalInteraction);
+    window.addEventListener('mousedown', handleGlobalInteraction);
+    window.addEventListener('touchstart', handleGlobalInteraction);
+
+    return () => {
+      window.removeEventListener('scroll', handleGlobalInteraction);
+      window.removeEventListener('wheel', handleGlobalInteraction);
+      window.removeEventListener('mousedown', handleGlobalInteraction);
+      window.removeEventListener('touchstart', handleGlobalInteraction);
+    };
+  }, [onClose]);
+
+  return (
+    // opaque background == focus
+    <div className="fixed inset-0 flex justify-center items-center w-full h-full bg-black/30 backdrop-blur-lg z-[999] animate__animated animate__fadeIn animate__faster">
+      
+      <div 
+        className={`cursor-pointer group ${isExiting ? 'sticky-peel-exit' : ''}`}
+        style={{ 
+          animation: 'stickyReversePop 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards' 
+        }}
+        onClick={(e) => {
+          e.stopPropagation();
+          onClose();
+        }}
+      >
+
+        <div className="absolute inset-x-4 bottom-2 h-8 bg-black/30 blur-xl rounded-[100%] transition-opacity duration-300 group-hover:opacity-50"></div>
+
+        <div 
+          className="relative bg-blue-200 dark:bg-blue-300 pt-6 px-6 pb-4 w-[300px] md:w-[350px] transition-transform duration-300 shadow-2xl"
+          style={{ 
+            transform: 'rotate(-2deg)',
+            clipPath: 'polygon(0% 0%, 100% 0%, 100% 80%, 80% 100%, 0% 100%)',
+            animation: 'stickyReversePop 0.8s cubic-bezier(0.165, 0.84, 0.44, 1) forwards'
+          }}
+        >
+
+          <div className="absolute top-0 left-0 w-full h-3 md:h-4 bg-black/5"></div>
+          
+          <div className="mt-2 select-none">
+            <h2 className="font-sans font-black uppercase text-[10px] tracking-[0.2em] mb-2 text-black/30">Note from Shriya</h2>
+            <p className="font-['Caveat'] text-xl md:text-3xl text-neutral-800 leading-tight mb-4">
+               Hey! Feel free to <span className="text-blue-700 underline underline-offset-4 decoration-blue-800/30">hover</span> over items with magnets and pins to flip 'em! You can also use the sun/moon magnet to switch between light and dark modes. 
+            </p>
+            <p className="font-mono text-[9px] uppercase tracking-tighter opacity-40 text-center pt-3 border-t border-black/10 text-black">
+               Click anywhere or Scroll to Peel
+            </p>
+          </div>
+
+
+{/* folded corner nonesense */}
+    <div 
+      className="absolute bottom-0 right-0 w-[20%] h-[20%] bg-black blur-[1px]" 
+      style={{ 
+        clipPath: 'polygon(100% 0%, 100% 100%, 0% 100%)',
+      }}
+    ></div>
+
+    <div 
+      className="absolute bottom-0 right-0 w-[20%] h-[20%] bg-blue-400 dark:bg-blue-400 shadow-[-3px_-3px_8px_rgba(0,0,0,0.2)] transition-all duration-500 group-hover:w-[22%] group-hover:h-[22%]" 
+      style={{ 
+        clipPath: 'polygon(0% 0%, 100% 0%, 0% 100%)',
+        transformOrigin: 'bottom left'
+      }}
+    ></div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export default function App() {
   const [playingVideoId, setPlayingVideoId] = useState(null);
   const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light');
@@ -647,7 +853,26 @@ export default function App() {
   const [replyText, setReplyText] = useState("");
   const [isTypingFinished, setIsTypingFinished] = useState(false);
   const [userData, setUserData] = useState({ name: "", email: "" });
+  const [showSticky, setShowSticky] = useState(true);
+  const [isExiting, setIsExiting] = useState(false);
 
+  const pageLoadTime = useRef(Date.now());
+  const [timeToClick, setTimeToClick] = useState(0);
+
+  //guide sitcky closign: 
+  const handleDismiss = () => {
+    setIsExiting(true);
+    
+    setTimeout(() => setShowSticky(false), 600);
+    const duration = Date.now() - pageLoadTime.current;
+    
+    setTimeToClick(duration / 1000);
+
+    console.log(`${duration}ms from page load to click.`);
+  };
+  
+
+  
   const handleSubmit = (e) => {
     e.preventDefault();
     const formData = new FormData(formRef.current);
@@ -1004,7 +1229,7 @@ export default function App() {
 
 
     //social media stickies
-    { id: 'st-1', type: 'sticky', title: "LinkedIn", text: "/in/shriya-biddala", color: 'bg-yellow-200 dark:bg-yellow-500', icon: faLinkedin, rotate: 'rotate-6', link: 'https://linkedin.com' },
+    { id: 'st-1', type: 'sticky', title: "LinkedIn", text: "/in/shriya-biddala", color: 'bg-yellow-200 dark:bg-yellow-500', icon: faLinkedin, rotate: 'rotate-6', link: 'https://www.linkedin.com/in/shriya-biddala' },
     { id: 'st-2', type: 'sticky', title: "GitHub", text: "Commits: @shriyabi", color: 'bg-cyan-200 dark:bg-cyan-500', icon: faGithub, rotate: '-rotate-6', link: 'https://github.com/shriyabi' },
     { id: 'st-3', type: 'sticky', title: "Email", text: "shriyarbiddala@gmail.com", color: 'bg-red-200 dark:bg-red-500', icon: faEnvelope, rotate: 'rotate-6', link: "mailto:shriyarbiddala@gmail.com" },
     { id: 'st-4', type: 'sticky', title: "YouTube", text: "Shri Ram", color: 'bg-green-200 dark:bg-green-500', icon: faYoutube, rotate: 'rotate-6', link: 'https://www.youtube.com/channel/UCF1wX0AqAWlqtwaSraqN6kA' },
@@ -1030,26 +1255,32 @@ export default function App() {
 
 
   return (
-    <div className="min-h-screen corkboard bg-[#F0E8D3] dark:bg-[#241B15] text-neutral-900 dark:text-neutral-100 p-8">
+    <div className="min-h-screen w-screen corkboard bg-[#F0E8D3] dark:bg-[#241B15] text-neutral-900 dark:text-neutral-100 p-8">
 
-      <div className="max-w-[1600px] mx-auto flex flex-col md:flex-row justify-between items-end mb-24 px-8 relative">
+{showSticky && <FallingSticky isExiting={isExiting} onClose={handleDismiss} />}
+      <IdleScrollIndicator isStickyDismissed={isExiting} delayMs={timeToClick}/>
 
+      <div className="max-w-[1600px] mx-auto  flex flex-col md:flex-row justify-between items-end mb-24 px-8 relative">
+        
         <div className="relative inline-block group">
           {/* highligher animation */}
           <style>{`
-    @keyframes highlightStroke {
-      from { clip-path: inset(0 100% 0 0); }
-      to { clip-path: inset(0 0 0 0); }
-    }
-    .animate-stroke {
-      animation: highlightStroke 0.8s cubic-bezier(0.19, 1, 0.22, 1) forwards;
-      animation-delay: 0.6s;
-    }
-  `}</style>
+  @keyframes highlightStroke {
+    from { clip-path: inset(0 100% 0 0); }
+    to { clip-path: inset(0 0 0 0); }
+  }
+  .animate-stroke {
+    animation: highlightStroke 0.8s cubic-bezier(0.19, 1, 0.22, 1) forwards;
+    /* Use kebab-case 'animation-delay' for raw CSS inside <style> tags */
+    animation-delay: ${isExiting ? (timeToClick) : 0}s;
+  }
+`}</style>
+
+${console.log("1289", isExiting)}
 
           {/* highlighter */}
           <div
-            className="absolute top-1 -left-2 -right-4 h-[45%] bg-blue-400/40 dark:bg-blue-500/60 z-0 animate-stroke"
+            className={`absolute top-5 -left-2 -right-4 h-[45%] bg-blue-400/40 dark:bg-blue-500/60 z-0 ${isExiting ? 'animate-stroke' : ''}`}
             style={{
               borderRadius: '20% 80% 15% 85% / 95% 15% 85% 5%',
               filter: 'blur(0.4px)',
@@ -1067,16 +1298,18 @@ export default function App() {
         </div>
 
         
+       
 
       </div>
 
+       
       {/* integrated divs with all types of photos = vision board */}
       <div className="max-w-[1600px] animate__animated animate__fadeIn animate__delay-1s mx-auto flex flex-wrap gap-8 md:gap-16 justify-center pb-32 justify-start items-start">
         {boardData.map(item => {
           if (item.type === 'polaroid') return <PolaroidItem key={item.id} data={item} onPlay={setPlayingVideoId} isPlaying={playingVideoId === item.id} />;
           if (item.type === 'film_strip') return <PhotoStripItem key={item.id} data={item} />;
           if (item.type === 'postcard') return <PostcardItem key={item.id} data={item} />;
-          if (item.type === 'lined_note') return <IDCard key={item.id} data={item} theme={theme} setTheme={setTheme} />;
+          if (item.type === 'lined_note') return <IDCard key={item.id} data={item} theme={theme} setTheme={setTheme} isStickyClosed={isExiting} />;
           if (item.type === 'sticky') return <StickyItem key={item.id} data={item} />;
           if (item.type === 'skills_sticky') return <SkillSticky key={item.id} title={item.title} skills={item.skills} color={item.color} rotate={item.rotate} />;
           return null;
@@ -1086,7 +1319,7 @@ export default function App() {
       {/* contact me postcard */}
 <div id="Contact" className="w-full flex justify-center flex-col items-center py-20 px-4 md:px-20 relative">
   {/* washi tape */}
-  <div className="w-32 h-10 bg-blue-200/40 backdrop-blur-[2px] shadow-sm mb-[-15px] z-20 rotate-3 border-x border-blue-400/20"
+  <div className="w-32 h-10 bg-blue-200/40 backdrop-blur-[2px] shadow-sm mb-[-15px] z-20 rotate-3 border-x border-blue-400/20 dark:bg-blue-400/60 "
     style={{ clipPath: 'polygon(5% 0%, 95% 0%, 100% 50%, 95% 100%, 5% 100%, 0% 50%)' }}></div>
 
   <div className="relative w-full max-w-[850px] aspect-auto md:aspect-[3/2] min-h-[600px] md:min-h-0">
@@ -1096,7 +1329,7 @@ export default function App() {
     <div className="absolute inset-0 bg-white dark:bg-neutral-600 border border-neutral-200 dark:border-neutral-700 shadow-lg rotate-1 -translate-x-1 md:-translate-x-2 -translate-y-1 z-0 opacity-40"></div>
 
     <form ref={formRef} onSubmit={handleSubmit}
-      className="relative w-full h-full bg-[#fffcf5] dark:bg-[#E2E1DE] shadow-2xl border border-neutral-300 dark:border-neutral-400 p-6 md:p-8 flex flex-col md:flex-row gap-10 md:gap-8 overflow-hidden z-10">
+      className="relative w-full h-full bg-[#fffcf5] dark:bg-[#E2E1DE] shadow-2xl border border-neutral-300 dark:border-neutral-400 p-6 lg:p-8 flex flex-col md:flex-row gap-10 md:gap-8 overflow-hidden z-10">
 
       {/* message side */}
       <div className="flex-[1.2] flex flex-col min-h-[250px] md:min-h-0">
@@ -1131,7 +1364,7 @@ export default function App() {
       {/* address/sender side */}
       <div className="flex-1 flex flex-col justify-between gap-8 md:gap-0">
         {/*stamp */}
-        <div className="self-end w-15 h-20 lg:w-20 lg:h-28 border-2 border-red-500/30 dark:border-red-500/20 border-double flex flex-col items-center justify-center p-2 relative shrink-0">
+        <div className="self-end w-15 h-20 md:h-12 lg:w-20 lg:h-28 border-2 border-red-500/30 dark:border-red-500/20 border-double flex flex-col items-center justify-center p-2 relative shrink-0">
           <div className={`text-[9px] font-black ${isSent ? 'text-red-600/40' : 'text-red-600'} uppercase text-center leading-none`}>Shriya<br />Biddala</div>
           {isSent && (
             <div className="absolute inset-0 flex items-center justify-center rotate-12 animate__animated animate__zoomIn">
@@ -1140,7 +1373,7 @@ export default function App() {
           )}
         </div>
 
-        <div className="space-y-8 md:space-y-10 relative">
+        <div className="space-y-8 lg:space-y-10 relative">
           {!isSent ? (
             <>
               <div className="relative border-b border-neutral-300 dark:border-neutral-700 pb-1">
