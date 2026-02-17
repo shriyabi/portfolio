@@ -122,7 +122,10 @@ const PolaroidItem = ({ data, onPlay, isPlaying }) => {
   const [isHoveringCard, setIsHoveringCard] = useState(false);
   const [isOverVideo, setIsOverVideo] = useState(false);
   const shouldFlip = isHoveringCard && !isOverVideo; //dont flip over video so user can play
-
+  const [hasScrolled, setHasScrolled] = useState(false);
+  const [isOverflowing, setIsOverflowing] = useState(false);
+  const scrollRef = useRef(null);
+  
   const [isMobile, setIsMobile] = useState(false);
 
   //resize for mobile
@@ -132,6 +135,17 @@ const PolaroidItem = ({ data, onPlay, isPlaying }) => {
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
+
+useEffect(() => {
+  if (scrollRef.current) {
+    const { scrollHeight, clientHeight } = scrollRef.current;
+    setIsOverflowing(scrollHeight > clientHeight);
+  }
+}, [data.text]);
+
+const handleScroll = (e) => {
+  if (e.target.scrollTop > 10) setHasScrolled(true);
+};
 
   const front = (
     <>
@@ -186,59 +200,68 @@ const PolaroidItem = ({ data, onPlay, isPlaying }) => {
     </>
   );
 
-  const back = (
-    <div className="flex flex-col h-full justify-between">
-      <div className="space-y-3">
-        <h4 className="font-black uppercase text-[8px] md:text-[10px] tracking-widest text-blue-600 dark:text-blue-500">Project Insight</h4>
-        <p className="font-['Caveat'] text-base md:text-lg leading-tight text-neutral-700 dark:text-neutral-600 line-clamp-5">
-          {data.text}
-        </p>
-        <div className="pt-2 border-t border-neutral-100 dark:border-neutral-200">
-          <p className="font-mono text-[11px] text-blue-800 dark:text-blue-600 font-bold uppercase">
-            {data.skills}
-          </p>
-        </div>
-      </div>
+const back = (
+  <div className="flex flex-col h-full gap-4 relative">
+    <div className="flex flex-col flex-1 min-h-0 relative">
+      
+      <div className="flex items-center justify-between mb-2 flex-shrink-0">
+        <h4 className="font-black uppercase text-[8px] md:text-[10px] tracking-widest text-blue-600 dark:text-blue-500">
+          Project Insight
+        </h4>
 
-      <div className="space-y-4">
-        <div className="flex gap-4 text-xl text-neutral-400">
-          {data.ghlink && <a href={data.ghlink} target="_blank" rel="noreferrer"><FontAwesomeIcon icon={faGithub} className="text-black" /></a>}
-          {data.devpost && (
-            <a
-              href={data.devpost}
-              target="_blank"
-              rel="noreferrer"
-              className="text-[#003E54] transition-colors"
-            >
-              <svg
-                fill="currentColor"
-                viewBox="0 0 24 24"
-                className="w-6 h-6"
-              >
-                <path d="M6.002 1.61L0 12.004L6.002 22.39h11.996L24 12.004L17.998 1.61zm1.593 4.084h3.947c3.605 0 6.276 1.695 6.276 6.31 0 4.436-3.21 6.302-6.456 6.302H7.595zm2.517 2.449v7.714h1.241c2.646 0 3.862-1.55 3.862-3.861.009-2.569-1.096-3.853-3.767-3.853z" />
-              </svg>
-            </a>
-          )}
-          {data.yt && <a href={data.yt} target="_blank" rel="noreferrer"><FontAwesomeIcon icon={faYoutube} className="text-red-600" /></a>}
-        </div>
-
-        {data.website && (
-          <a
-            href={data.website}
-            target="_blank"
-            rel="noreferrer"
-            className="group/link relative inline-flex items-center gap-3 px-1"
-          >
-            <div className="absolute -inset-x-1 bottom-0 h-1 bg-blue-400/20 group-hover/link:h-full transition-all duration-200 -rotate-1"></div>
-
-            <span className="relative z-10 font-['Caveat'] text-base font-bold text-neutral-800 dark:text-neutral-200">
-              Launch Project <span className="text-2xl"> ↗ </span>
-            </span>
-          </a>
+{/* keep scrolling indicator */}
+        {isOverflowing && !hasScrolled && (
+          <div className="flex items-center gap-1 animate-pulse text-blue-500 transition-opacity duration-500">
+            <span className="text-[7px] md:text-[8px] font-bold uppercase tracking-tighter">Keep Scrolling</span>
+            <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" viewBox="0 0 16 16" className="animate-bounce">
+              <path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"/>
+            </svg>
+          </div>
         )}
       </div>
+
+      <div 
+        ref={scrollRef}
+        onScroll={handleScroll} 
+        className="flex-1 overflow-y-auto pr-2 custom-project-scroll text-neutral-700 dark:text-neutral-400"
+      >
+        <p className="font-['Caveat'] text-base md:text-lg leading-tight mb-4">
+          {data.text}
+        </p>
+      </div>
+
+      <div className="pt-2 border-t border-neutral-100 dark:border-neutral-200 flex-shrink-0">
+        <p className="font-mono text-[11px] text-blue-800 dark:text-blue-600 font-bold uppercase">
+          {data.skills}
+        </p>
+      </div>
     </div>
-  );
+
+{/* icons */}
+    <div className="flex flex-col gap-3 pt-2 border-t border-neutral-100 dark:border-neutral-800 flex-shrink-0">
+      <div className="flex gap-4 text-xl text-neutral-400">
+        {data.ghlink && <a href={data.ghlink} target="_blank" rel="noreferrer"><FontAwesomeIcon icon={faGithub} className="text-black dark:text-white" /></a>}
+        {data.devpost && (
+          <a href={data.devpost} target="_blank" rel="noreferrer" className="text-[#003E54] dark:text-[#00A3D9] transition-colors">
+            <svg fill="currentColor" viewBox="0 0 24 24" className="w-6 h-6">
+              <path d="M6.002 1.61L0 12.004L6.002 22.39h11.996L24 12.004L17.998 1.61zm1.593 4.084h3.947c3.605 0 6.276 1.695 6.276 6.31 0 4.436-3.21 6.302-6.456 6.302H7.595zm2.517 2.449v7.714h1.241c2.646 0 3.862-1.55 3.862-3.861.009-2.569-1.096-3.853-3.767-3.853z" />
+            </svg>
+          </a>
+        )}
+        {data.yt && <a href={data.yt} target="_blank" rel="noreferrer"><FontAwesomeIcon icon={faYoutube} className="text-red-600" /></a>}
+      </div>
+
+      {data.website && (
+        <a href={data.website} target="_blank" rel="noreferrer" className="group/link relative inline-flex items-center gap-3 px-1">
+          <div className="absolute -inset-x-1 bottom-0 h-1 bg-blue-400/20 group-hover/link:h-full transition-all duration-200 -rotate-1"></div>
+          <span className="relative z-10 font-['Caveat'] text-base font-bold text-neutral-800 dark:text-neutral-200">
+            Launch Project <span className="text-2xl"> ↗ </span>
+          </span>
+        </a>
+      )}
+    </div>
+  </div>
+);
 
   return (
     <div
@@ -282,7 +305,7 @@ const PostcardItem = ({ data }) => {
         <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-8 h-3 bg-black/40 blur-md rounded-full -z-10"></div>
       </div>
 
-      <div className="bg-[#fffcf5] dark:bg-[#F3F3F1] board-item-shadow p-3 h-full shadow-2xl shadow-black/50 border border-neutral-300 dark:border-[#D1D1D1]flex flex-col">
+      <div className="bg-[#fffcf5] dark:bg-[#F3F3F1] board-item-shadow  board-item-shadow p-3 h-full shadow-2xl shadow-black/50 border border-neutral-300 dark:border-[#D1D1D1]flex flex-col">
         <div className="w-full h-[75%] bg-neutral-100 dark:bg-[#F3F3F1] overflow-hidden relative border-b border-neutral-200 dark:border-[#D1D1D1]">
           {/* postcard image */}
           <img src={data.img} className="w-full h-full object-cover" alt="card-art" />
@@ -769,7 +792,7 @@ const IdleScrollIndicator = ({ isStickyDismissed, delayMs }) => {
               filter: 'blur(0.5px)'
             }}
           ></span>
-          <span className="relative z-10 mx-1 my-1 font-['Caveat'] text-2xl md:text-3xl text-red-600 italic">
+          <span className="relative z-10 mx-1 my-1 font-['Caveat'] text-2xl font-black md:text-3xl text-red-600 dark:text-red-700 italic">
             Keep exploring...
           </span>
         </div>
