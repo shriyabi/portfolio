@@ -257,3 +257,32 @@
     opacity: 0; 
   }
 }
+
+.custom-project-scroll::-webkit-scrollbar {
+  width: 4px;
+}
+
+.custom-project-scroll::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.03);
+  border-radius: 10px;
+}
+
+.custom-project-scroll::-webkit-scrollbar-thumb {
+  background: #3b82f6; 
+  border-radius: 10px;
+}
+
+@keyframes gentle-bounce {
+  0%, 100% {
+    transform: translateY(0);
+    animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+  }
+  50% {
+    transform: translateY(25%);
+    animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+  }
+}
+
+.animate-bounce-slow {
+  animation: gentle-bounce 2s infinite;
+}

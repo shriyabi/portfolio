@@ -141,12 +141,15 @@ useEffect(() => {
     const { scrollHeight, clientHeight } = scrollRef.current;
     setIsOverflowing(scrollHeight > clientHeight);
   }
-}, [data.text]);
+  
+  if (!shouldFlip) {
+    setHasScrolled(false);
+  }
+}, [data.text, shouldFlip]); 
 
 const handleScroll = (e) => {
-  if (e.target.scrollTop > 10) setHasScrolled(true);
+  if (e.target.scrollTop > 10) setHasScrolled(true); //hide if user
 };
-
   const front = (
     <>
       <Pushpin />
@@ -209,11 +212,11 @@ const back = (
           Project Insight
         </h4>
 
-{/* keep scrolling indicator */}
+        {/* indicate to scroll if applicable */}
         {isOverflowing && !hasScrolled && (
           <div className="flex items-center gap-1 animate-pulse text-blue-500 transition-opacity duration-500">
             <span className="text-[7px] md:text-[8px] font-bold uppercase tracking-tighter">Keep Scrolling</span>
-            <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" viewBox="0 0 16 16" className="animate-bounce">
+            <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" viewBox="0 0 16 16" className="animate-bounce-slow">
               <path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"/>
             </svg>
           </div>
@@ -236,10 +239,10 @@ const back = (
         </p>
       </div>
     </div>
-
-{/* icons */}
+    
+    {/* link icons */}
     <div className="flex flex-col gap-3 pt-2 border-t border-neutral-100 dark:border-neutral-800 flex-shrink-0">
-      <div className="flex gap-4 text-xl text-neutral-400">
+       <div className="flex gap-4 text-xl text-neutral-400">
         {data.ghlink && <a href={data.ghlink} target="_blank" rel="noreferrer"><FontAwesomeIcon icon={faGithub} className="text-black dark:text-white" /></a>}
         {data.devpost && (
           <a href={data.devpost} target="_blank" rel="noreferrer" className="text-[#003E54] dark:text-[#00A3D9] transition-colors">
