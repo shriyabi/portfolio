@@ -464,22 +464,19 @@ const StickyItem = ({ data }) => (
 
 const IDCard = ({ data, theme, setTheme, time, isStickyClosed }) => {
   const [showGuide, setShowGuide] = useState(false);
-  console.log("sticky closed", isStickyClosed); 
-console.log("442", showGuide); 
+ console.log("467", sessionStorage.getItem('visited_id_guide')); 
+  
+
 useEffect(() => {
-  const hasSeen = sessionStorage.getItem('visited_id_guide');
-  console.log("445", hasSeen); 
+  //const hasSeen = sessionStorage.getItem('visited_id_guide') === 'true';
+  const hasSeen = false; 
   if (!hasSeen && isStickyClosed) setShowGuide(true); 
 
   console.log("447", showGuide); 
 
   const clearGuide = () => {
-    setShowGuide((prev) => {
-      if (prev) {
-        sessionStorage.setItem('visited_id_guide', 'true');
-      }
-      return false;
-    });
+    setShowGuide(false);
+    //sessionStorage.setItem('visited_id_guide', 'true');
   };
 
   if (isStickyClosed && !hasSeen) {
@@ -501,6 +498,9 @@ useEffect(() => {
   console.log("cryy", showGuide, isStickyClosed); 
 
   const OnboardingGuide = ({ isVisible, time }) => {
+
+    console.log("505",isVisible); 
+
     if (!isVisible) return null;
 
     return (
@@ -560,6 +560,7 @@ useEffect(() => {
     <div className="relative inline-block group w-[325px] h-[250px] md:w-[520px] md:h-[390px]">
       
       <OnboardingGuide isVisible={showGuide} time={time} />
+
 
       {/* dark/light mode magnet */}
       <div className="absolute -top-6 -right-1 md:-right-6 z-50 transition-transform duration-300 group-hover:scale-110">
