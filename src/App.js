@@ -243,9 +243,9 @@ const back = (
     {/* link icons */}
     <div className="flex flex-col gap-3 pt-2 border-t border-neutral-100 dark:border-neutral-800 flex-shrink-0">
        <div className="flex gap-4 text-xl text-neutral-400">
-        {data.ghlink && <a href={data.ghlink} target="_blank" rel="noreferrer"><FontAwesomeIcon icon={faGithub} className="text-black dark:text-white" /></a>}
+        {data.ghlink && <a href={data.ghlink} target="_blank" rel="noreferrer"><FontAwesomeIcon icon={faGithub} className="text-black" /></a>}
         {data.devpost && (
-          <a href={data.devpost} target="_blank" rel="noreferrer" className="text-[#003E54] dark:text-[#00A3D9] transition-colors">
+          <a href={data.devpost} target="_blank" rel="noreferrer" className="text-[#003E54] transition-colors">
             <svg fill="currentColor" viewBox="0 0 24 24" className="w-6 h-6">
               <path d="M6.002 1.61L0 12.004L6.002 22.39h11.996L24 12.004L17.998 1.61zm1.593 4.084h3.947c3.605 0 6.276 1.695 6.276 6.31 0 4.436-3.21 6.302-6.456 6.302H7.595zm2.517 2.449v7.714h1.241c2.646 0 3.862-1.55 3.862-3.861.009-2.569-1.096-3.853-3.767-3.853z" />
             </svg>
@@ -465,8 +465,8 @@ const StickyItem = ({ data }) => (
 const IDCard = ({ data, theme, setTheme, time, isStickyClosed }) => {
   const [showGuide, setShowGuide] = useState(false);
  console.log("467", sessionStorage.getItem('visited_id_guide')); 
+  const isDark = window.matchMedia("(prefers-color-scheme: dark)").matches; 
   
-
 useEffect(() => {
   //const hasSeen = sessionStorage.getItem('visited_id_guide') === 'true';
   const hasSeen = false; 
@@ -519,7 +519,10 @@ useEffect(() => {
           animationDelay:`${0.7 + time}s`
         }}
       ></span>
-      <span className="relative z-10 text-red-600 dark:text-red-400"> Note: Click the magnet for Dark Mode</span>
+      {isDark ? 
+      <span className="relative z-10 text-red-600 font-black dark:text-red-400"> Note: Click the magnet for Light Mode</span> :
+      <span className="relative z-10 text-red-600 font-black dark:text-red-400"> Note: Click the magnet for Dark Mode</span>
+      }
     </span>
   </p>
    {/* handdrawn arrow */}
@@ -796,7 +799,7 @@ const IdleScrollIndicator = ({ isStickyDismissed, delayMs }) => {
               filter: 'blur(0.5px)'
             }}
           ></span>
-          <span className="relative z-10 mx-1 my-1 font-['Caveat'] text-2xl font-black md:text-3xl text-red-600 dark:text-red-700 italic">
+          <span className="relative z-10 mx-1 my-1 font-['Caveat'] text-2xl font-semibold md:text-3xl text-red-600 dark:text-red-700 italic">
             Keep exploring...
           </span>
         </div>
