@@ -9,7 +9,7 @@ import reportWebVitals from './reportWebVitals';
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <BrowserRouter>
+    <BrowserRouter basename="/sb-portfolio-2.0">
       <Routes>
         <Route path="/" element={<App />} />  
         <Route path="/resume" element={<Resume />} />
