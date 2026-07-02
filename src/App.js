@@ -894,6 +894,7 @@ export default function App() {
   const [replyText, setReplyText] = useState("");
   const [isTypingFinished, setIsTypingFinished] = useState(false);
   const [userData, setUserData] = useState({ name: "", email: "" });
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSticky, setShowSticky] = useState(true);
   const [isExiting, setIsExiting] = useState(false);
 
@@ -916,6 +917,11 @@ export default function App() {
   //form submit
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (isSubmitting || isSent) return;
+    setIsSubmitting(true);
+    setReplyText("");
+    setIsTypingFinished(false);
+
     const formData = new FormData(formRef.current);
     const name = formData.get("Name");
     const email = formData.get("Email");
@@ -927,39 +933,39 @@ export default function App() {
       body: new FormData(formRef.current)
     })
       .then(response => {
-        if (response.ok) {
-         
-          setIsSent(true);
-          formRef.current.reset();
-          const message = `Hey ${name.split(' ')[0]}! Got your message. I'll read this over and get back to your email at ${email} soon. – Shriya`;
-
-          let currentStep = 0;
-          const typingInterval = setInterval(() => {
-            setReplyText(message.slice(0, currentStep));
-            currentStep++;
-            if (currentStep > message.length) {
-              clearInterval(typingInterval);
-              setIsTypingFinished(true);
-            }
-          }, 40);
-
-
-        } else {
+        if (!response.ok) {
           throw new Error('Network response was not ok.');
         }
+
+        setIsSent(true);
+        formRef.current.reset();
+        const message = `Hey ${name.split(' ')[0]}! Got your message. I'll read this over and get back to your email at ${email} soon. – Shriya`;
+
+        let currentStep = 0;
+        const typingInterval = setInterval(() => {
+          setReplyText(message.slice(0, currentStep));
+          currentStep++;
+          if (currentStep > message.length) {
+            clearInterval(typingInterval);
+            setIsTypingFinished(true);
+          }
+        }, 40);
       })
       .catch(error => {
         console.error('Error!', error.message);
         const message = 'Something went wrong, please try again.';
         let currentStep = 0;
-          const typingInterval = setInterval(() => {
-            setReplyText(message.slice(0, currentStep));
-            currentStep++;
-            if (currentStep > message.length) {
-              clearInterval(typingInterval);
-              setIsTypingFinished(true);
-            }
-          }, 40);
+        const typingInterval = setInterval(() => {
+          setReplyText(message.slice(0, currentStep));
+          currentStep++;
+          if (currentStep > message.length) {
+            clearInterval(typingInterval);
+            setIsTypingFinished(true);
+          }
+        }, 40);
+      })
+      .finally(() => {
+        setIsSubmitting(false);
       });
   };
 
@@ -1373,8 +1379,8 @@ export default function App() {
   <div className="relative w-full max-w-[850px] aspect-auto md:aspect-[3/2] min-h-[600px] md:min-h-0">
 
         {/* additional post cards in background */}
-    <div className="absolute inset-0 bg-[#f9f5eb] dark:bg-neutral-700 border border-neutral-300 dark:border-neutral-700 shadow-xl -rotate-1 md:-rotate-2 translate-x-2 md:translate-x-4 translate-y-2 z-0 opacity-60"></div>
-    <div className="absolute inset-0 bg-white dark:bg-neutral-600 border border-neutral-200 dark:border-neutral-700 shadow-lg rotate-1 -translate-x-1 md:-translate-x-2 -translate-y-1 z-0 opacity-40"></div>
+    <div className="absolute inset-0 bg-[#f9f5eb] border border-neutral-300 shadow-xl -rotate-1 md:-rotate-2 translate-x-2 md:translate-x-4 translate-y-2 z-0 opacity-60"></div>
+    <div className="absolute inset-0 bg-white border border-neutral-200  shadow-lg rotate-1 -translate-x-1 md:-translate-x-2 -translate-y-1 z-0 opacity-40"></div>
 
     <form ref={formRef} onSubmit={handleSubmit}
       className="relative w-full h-full bg-[#fffcf5] dark:bg-[#E2E1DE] shadow-2xl border border-neutral-300 dark:border-neutral-400 p-6 lg:p-8 flex flex-col md:flex-row gap-10 md:gap-8 overflow-hidden z-10">
@@ -1411,14 +1417,22 @@ export default function App() {
 
       {/* address/sender side */}
       <div className="flex-1 flex flex-col justify-between gap-8 md:gap-0">
-        {/*stamp */}
-        <div className="self-end w-15 h-20 md:h-12 lg:w-20 lg:h-28 border-2 border-red-500/30 dark:border-red-500/20 border-double flex flex-col items-center justify-center p-2 relative shrink-0">
-          <div className={`text-[9px] font-black ${isSent ? 'text-red-600/40' : 'text-red-600'} uppercase text-center leading-none`}>Shriya<br />Biddala</div>
-          {isSent && (
-            <div className="absolute inset-0 flex items-center justify-center rotate-12 animate__animated animate__zoomIn">
-              <div className="border-2 border-blue-600/40 rounded-full px-2 py-1 text-[8px] font-black text-blue-600 uppercase">DISPATCHED</div>
-            </div>
-          )}
+        {/* stamp */}
+        <div className="flex justify-between items-start">
+          <div className="flex flex-row justify-center items-center">
+          <h3 className="font-mono text-sm uppercase text-neutral-400 dark:text-neutral-500 ">RE: </h3>
+          <h3 className="font-['Caveat'] text-2xl text-black opacity-90 dark:text-black">Contact Form</h3>
+          
+          </div>
+          {/*stamp */}
+          <div className="w-15 h-20 md:h-12 lg:w-20 lg:h-28 border-2 border-red-500/30 dark:border-red-500/20 border-double flex flex-col items-center justify-center p-2 relative shrink-0">
+            <div className={`text-[9px] font-black ${isSent ? 'text-red-600/40' : 'text-red-600'} uppercase text-center leading-none`}>Shriya<br />Biddala</div>
+            {isSent && (
+              <div className="absolute inset-0 flex items-center justify-center rotate-12 animate__animated animate__zoomIn">
+                <div className="border-2 border-blue-600/40 rounded-full px-2 py-1 text-[8px] font-black text-blue-600 uppercase">DISPATCHED</div>
+              </div>
+            )}
+          </div>
         </div>
 
         <div className="space-y-8 lg:space-y-10 relative">
@@ -1438,8 +1452,13 @@ export default function App() {
                   className="w-full bg-transparent placeholder-neutral-900 border-b border-neutral-300 dark:border-neutral-700 py-1 focus:border-blue-500 outline-none transition-colors font-['Caveat'] text-2xl text-neutral-800 dark:text-neutral-900 placeholder:opacity-30" />
                 <span className="absolute -top-4 left-0 text-[8px] font-mono uppercase text-neutral-400 dark:text-neutral-500 tracking-widest">Reply-To</span>
               </div>
-              <button type="submit" className="w-full placeholder-neutral-900 bg-blue-400 dark:bg-blue-500 text-white dark:text-white font-black py-2 uppercase text-[10px] tracking-widest hover:bg-blue-400 hover:text-white transition-all shadow-xl flex items-center justify-center gap-2">
-                <i className="fa-solid fa-paper-plane"></i> Post Message
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className={`w-full placeholder-neutral-900 bg-blue-400 dark:bg-blue-500 text-white dark:text-white font-black py-2 uppercase text-[10px] tracking-widest transition-all shadow-xl flex items-center justify-center gap-2 ${isSubmitting ? 'cursor-not-allowed opacity-60' : 'hover:bg-blue-400 hover:text-white'}`}
+              >
+                <i className={`fa-solid ${isSubmitting ? 'fa-spinner animate-spin' : 'fa-paper-plane'}`}></i>
+                {isSubmitting ? 'Sending...' : 'Post Message'}
               </button>
             </>
           ) : (
