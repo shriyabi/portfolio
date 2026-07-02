@@ -283,9 +283,10 @@ const back = (
   );
 };
 
-const PostcardItem = ({ data }) => {
+const PostcardItem = ({ data, isStickyClosed }) => {
   const [isHovering, setIsHovering] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [showNote, setShowNote] = useState(false);
 
   //resize for mobile
   useEffect(() => {
@@ -294,6 +295,29 @@ const PostcardItem = ({ data }) => {
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
+
+  useEffect(() => {
+    if (data.type !== 'postcard_enhanced') return;
+    if (!isStickyClosed) return;
+
+    setShowNote(true);
+    const clearNote = () => setShowNote(false);
+    const timeout = setTimeout(() => {
+      window.addEventListener('scroll', clearNote);
+      window.addEventListener('mousedown', clearNote);
+    }, 700);
+
+    return () => {
+      clearTimeout(timeout);
+      window.removeEventListener('scroll', clearNote);
+      window.removeEventListener('mousedown', clearNote);
+    };
+  }, [data.type, isStickyClosed]);
+
+  useEffect(() => {
+    if (!isHovering) return;
+    setShowNote(false);
+  }, [isHovering]);
 
   const front = (
     <>
@@ -360,6 +384,71 @@ const PostcardItem = ({ data }) => {
         height={isMobile ? "300px" : "400px"}
         isFlipped={isHovering}
       />
+      {showNote && (
+        <div className="relative w-full items-center flex flex-col justify-center animate__animated animate__fadeInDown">
+          <svg
+            viewBox="0 0 120 140"
+            className="w-20 h-32 text-blue-500/70 dark:text-blue-400/60"
+            style={{ transform: 'rotate(45deg)' }}
+          >
+            <path
+              d="M60,120 C58,90 52,65 58,35"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="6"
+              strokeLinecap="round"
+              className="path-animate"
+            />
+            <path
+              d="M58,35 L50,45 M58,35 L66,45"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="6"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+
+          <p className="font-['Caveat'] max-w-[400px] text-lg md:text-2xl text-red-600 dark:text-blue-400 rotate-3 leading-tight text-right pr-2">
+            <span className="relative inline-block px-1">
+              <span
+                className="absolute inset-0 bg-yellow-300/60 dark:bg-yellow-400/20 -rotate-1 translate-y-1"
+                style={{
+                  borderRadius: '20% 80% 15% 85% / 95% 15% 85% 5%',
+                  clipPath: 'inset(0 100% 0 0)',
+                  animation: 'highlightStroke 0.6s ease-out 1.2s forwards'
+                }}
+              ></span>
+              <span className="relative z-10 text-red-600 font-bold dark:text-red-400">
+                Note: hover over elements with a magnet or a pin for more information
+              </span>
+            </span>
+          </p>
+
+          <svg
+            viewBox="0 0 120 140"
+            className="w-20 h-32 text-blue-500/70 dark:text-blue-400/60"
+            style={{ transform: 'rotate(45deg)' }}
+          >
+            <path
+              d="M60,20 C62,50 68,80 60,110"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="6"
+              strokeLinecap="round"
+              className="path-animate"
+            />
+            <path
+              d="M60,110 L52,100 M60,110 L68,100"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="6"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </div>
+      )}
     </div>
   );
 };
@@ -996,7 +1085,8 @@ export default function App() {
   const boardData = [
     { id: 'edu-1', type: 'lined_note', title: "University of Michigan", items: ["B.S.E in Computer Science Engineering, 2026", "Instructional Aide for Data ", "Data Analytics Researcher"], rotate: '-rotate-1', category: 'edu' },
     { id: 'strip-1', type: 'film_strip', title: "# Hackathons", imgs: [twthrhack, twfivhack, twfrhack], rotate: 'rotate-2', category: 'edu' },
-    { id: 'exp-1', type: 'postcard', title: "Walmart Global Tech", role: "AI/ML SWE Intern", location: "Bentonville, AR", img: walmart, stamp: "USA", text: "Developed a reusable LLM-as-a-judge framework for 2.1M users, reducing hallucinations by 80% and cutting token costs by 30% via custom context summarization.", rotate: 'rotate-1', category: 'exp' },
+    /* { id: 'exp-1', type: 'postcard', title: "Walmart Global Tech", role: "AI/ML SWE Intern", location: "Bentonville, AR", img: walmart, stamp: "USA", text: "Developed a reusable LLM-as-a-judge framework for 2.1M users, reducing hallucinations by 80% and cutting token costs by 30% via custom context summarization.", rotate: 'rotate-1', category: 'exp' }, */
+    { id: 'exp-1', type: 'postcard_enhanced', title: "Walmart Global Tech", role: "AI/ML SWE Intern", location: "Bentonville, AR", img: walmart, stamp: "USA", text: "Developed a reusable LLM-as-a-judge framework for 2.1M users, reducing hallucinations by 80% and cutting token costs by 30% via custom context summarization.", rotate: 'rotate-1', category: 'exp' },
 
     //ai/ml cluster
     {
@@ -1362,7 +1452,7 @@ export default function App() {
         {boardData.map(item => {
           if (item.type === 'polaroid') return <PolaroidItem key={item.id} data={item} onPlay={setPlayingVideoId} isPlaying={playingVideoId === item.id} />;
           if (item.type === 'film_strip') return <PhotoStripItem key={item.id} data={item} />;
-          if (item.type === 'postcard') return <PostcardItem key={item.id} data={item} />;
+          if (item.type === 'postcard' || item.type === 'postcard_enhanced') return <PostcardItem key={item.id} data={item} isStickyClosed={isExiting} />;
           if (item.type === 'lined_note') return <IDCard key={item.id} data={item} theme={theme} setTheme={setTheme} isStickyClosed={isExiting} />;
           if (item.type === 'sticky') return <StickyItem key={item.id} data={item} />;
           if (item.type === 'skills_sticky') return <SkillSticky key={item.id} title={item.title} skills={item.skills} color={item.color} rotate={item.rotate} />;
